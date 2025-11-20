@@ -5,7 +5,7 @@ export interface InputProps{
     forName : string,
     labelTxt : string,
     type : string,
-    ref : RefObject<HTMLInputElement>,
+    ref : RefObject<HTMLInputElement | null>,
     inpTxt : string,
     inpCN : string
 }
