@@ -1,1 +1,27 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+*{
+    font-family : "Source Code Pro", monospace;
+}
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-move 6s ease infinite;
+}
+
+
+select {
+    appearance: none;
+}
