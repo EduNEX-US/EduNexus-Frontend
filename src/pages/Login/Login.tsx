@@ -36,7 +36,7 @@ export default function Login(){
                         <label className='text-white text-shadow-2xs text-shadow-black font-bold text-xl mb-2'>Password</label>
                         <Div cn='w-full flex justify-center items-center'>
                             <input className='placeholder:text-shadow-2xs placeholder:text-shadow-black text-shadow-2xs text-shadow-black inset-ring-2 outline-none inset-ring-black border-r-0 rounded-l-xl text-white w-4/5 p-2' placeholder='2541x89rft...' name='pass' ref={passRef} type={passType}></input>
-                            <Span cn='w-1/5 inset-ring-2 p-2 rounded-r-xl text-center' onClick={handlePassType}><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Span>
+                            <Span cn='w-1/5 inset-ring-2 p-2 rounded-r-xl text-center cursor-pointer hover:bg-lime-800/30' onClick={handlePassType}><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Span>
                         </Div>
                     </Div>
                     <Div cn='h-1/8 w-3/4 flex justify-around'>
@@ -55,7 +55,7 @@ export default function Login(){
                     </Div>
                     <Span cn={`text-red-800 ${!emptyfield ? "visible" : "invisible"}`}>Field Not selected</Span>
                     <Div cn='h-1/4 w-2/4 mt-4'>
-                        <Button cn='w-full bg-white text-lime-400 hover:text-white font-bold hover:bg-lime-400 text-xl p-2 rounded-xl' onClick={handleLogin}>Login</Button>
+                        <Button cn='w-full bg-white text-lime-400 hover:text-white font-bold hover:bg-lime-400 text-xl p-2 rounded-xl' onClick={()=>{handleLogin(); }}>Login</Button>
                     </Div>
                 </Div>
             </Div>

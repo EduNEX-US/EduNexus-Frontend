@@ -1,5 +1,5 @@
 export interface ButtonProps{
-    children : string,
+    children : string | React.ReactNode,
     onClick : ()=> void,
     type? : string,
     cn : string
