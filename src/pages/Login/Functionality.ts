@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import g1 from '../../assets/G-1.jpg';
 import g2 from '../../assets/G-2.jpg';
 import g3 from '../../assets/G-3.jpg';
-
 type Role = "student" | "admin" | "teacher";
 export default function useFuncs(){
     const idRef = useRef<HTMLInputElement>(null);
