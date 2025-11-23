@@ -40,3 +40,16 @@
 select {
     appearance: none;
 }
+
+::-webkit-scrollbar{
+  scrollbar-width: thin;
+  scrollbar-color: oklch(84.1% 0.238 128.85);
+}
+
+tr:nth-child(even) {
+  background-color: oklch(84.1% 0.238 128.85);
+}
+
+tbody>tr:nth-child(odd) {
+  background-color: oklch(86.9% 0.005 56.366);
+}
