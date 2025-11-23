@@ -1,9 +1,17 @@
 import {Section} from '../../../Components/Assembler';
 import Dashboard from '../Dashboard/Dashboard';
 import Sidebar from '../../../Components/Sidebar/Sidebar';
+import useStudent from './Functionality';
+import Marks from '../Marks/Marks';
+import Ptm from '../PTM/Ptm';
+import Lost_Found from '../Lost&Found/Lost_Found';
 export default function Student_View(){
-    return <Section cn='w-full h-lvh flex'>
-        <Sidebar />
-        <Dashboard />
+    const {activeTab, handleActiveTab} = useStudent();
+    return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
+        <Sidebar handleFunc={handleActiveTab}/>
+        { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
+        { activeTab === "marks" && <Marks /> }
+        { activeTab === "lost&found" && <Lost_Found /> }
+        { activeTab === "ptm" && <Ptm /> }
     </Section>
 }
