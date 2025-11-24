@@ -14,15 +14,15 @@ export default function Marks(){
 const totalScore = allMarks[selectedExam].reduce((a : number, m : MarkEntry) => a + m.score, 0);
 const totalPossible = allMarks[selectedExam].reduce((a :  number, m : MarkEntry) => a + m.total, 0);
 
-    return <Section cn=' overflow-y-auto md:w-5/6 w-full md:h-lvh h-5/6 flex flex-col md:flex-row justify-between'>
-      <Div cn="space-y-6 w-full">
-        <Div cn="bg-white p-6 w-full shadow-sm">
-          <Div cn="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h2 className="text-xl font-semibold text-lime-400 text-shadow-sm text-shadow-black">Academic Performance</h2>
+    return <Section cn=' overflow-y-auto md:w-5/6 w-full md:h-lvh h-5/6 flex flex-col md:flex-row justify-between'> {/* Marks Section */}
+        <Div cn="bg-white p-6 w-full shadow-sm"> {/* Parent Div for categorizing child elements */}
+          {/* Div Holding Selection Feature of Term Marks */}
+          <Div cn="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"> 
+            <h2 className="text-xl font-semibold text-cyan-400 text-shadow-sm text-shadow-black">Academic Performance</h2>
             <select
                 value={selectedExam}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleSelectedExam(e.target.value as ExamName)}
-                className="px-4 bg-lime-400 text-shadow-xs text-shadow-black text-white  py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-4 bg-cyan-400 text-shadow-xs text-shadow-black text-white  py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
                 {(Object.keys(allMarks) as ExamName[]).map(exam => (
                     <option key={exam} value={exam}>{exam}</option>
@@ -30,34 +30,39 @@ const totalPossible = allMarks[selectedExam].reduce((a :  number, m : MarkEntry)
             </select>
           </Div>
           
+          {/* Div for Holding Data Tabs */}
           <Div cn="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <Div cn="bg-gradient-to-br from-rose-600 via-rose-500 to-pink-600 rounded-xl p-5 text-white flex flex-col">
+            {/* Overall Percentage */}
+            <Div cn="bg-gradient-to-br from-cyan-600 via-cyan-500 to-white rounded-xl p-5 text-white flex flex-col">
               <Span cn="text-indigo-100 text-sm text-shadow-sm text-shadow-black">Overall Percentage</Span>
               <Span cn="text-3xl font-bold mt-1 text-shadow-sm text-shadow-black">{calculatePercentage(totalScore, totalPossible)}%</Span>
-              {/* <div className="flex items-center gap-1 mt-2 text-emerald-300 text-sm"><TrendingUp size={14} /> +2.3% from last exam</div> */}
             </Div>
-            <Div cn="bg-white border border-gray-200 rounded-xl p-5 flex flex-col">
-              <Span cn="text-gray-500 text-sm">Total Marks</Span>
-              <Span cn="text-3xl font-bold text-lime-400 text-shadow-sm text-shadow-black mt-1">{totalScore} <Span cn="text-lg text-gray-400">/ {totalPossible}</Span></Span>
+            {/* Overall Marks */}
+            <Div cn="bg-black border border-gray-200 rounded-xl p-5 flex flex-col">
+              <Span cn="text-gray-400 text-sm">Total Marks</Span>
+              <Span cn="text-3xl font-bold text-cyan-400 text-shadow-sm text-shadow-black mt-1">{totalScore} <Span cn="text-lg text-gray-400">/ {totalPossible}</Span></Span>
             </Div>
-            <Div cn="bg-white border border-gray-200 rounded-xl p-5 flex flex-col">
+            {/* Class Rank */}
+            <Div cn="bg-black border border-gray-200 rounded-xl p-5 flex flex-col">
               <Span cn="text-gray-500 text-sm ">Class Rank</Span>
-              <Span cn="text-3xl font-bold text-lime-400 text-shadow-sm text-shadow-black mt-1">5<Span cn="text-lg text-gray-400">th</Span></Span>
+              <Span cn="text-3xl font-bold text-cyan-400 text-shadow-sm text-shadow-black mt-1">5<Span cn="text-lg text-gray-400">th</Span></Span>
               <Span cn="text-xs text-gray-500 mt-1">Out of 42 students</Span>
             </Div>
           </Div>
 
+          {/* Marks Graph */}
           <Div cn="h-64 mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(v, n, p) => [`${v}%`, p.payload.fullName]} />
-                <Bar dataKey="score" fill="oklch(84.1% 0.238 128.85)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="score" fill="oklch(78.9% 0.154 211.53)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Div>
 
+          {/* Marks Table */}
           <Div cn="">
             <table className="w-full">
               <thead className='w-full text-sm'><tr className="border-b border-gray-100 bg-slate-900 w-full">
@@ -78,8 +83,6 @@ const totalPossible = allMarks[selectedExam].reduce((a :  number, m : MarkEntry)
               </tbody>
             </table>
           </Div>
-        
-        </Div>
         </Div>
     </Section>
 }
