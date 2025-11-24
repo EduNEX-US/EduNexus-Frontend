@@ -47,7 +47,7 @@ select {
 }
 
 tr:nth-child(even) {
-  background-color: oklch(84.1% 0.238 128.85);
+  background-color: oklch(78.9% 0.154 211.53);
 }
 
 tbody>tr:nth-child(odd) {

@@ -1,14 +1,22 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Button, Section, Div, Span} from '../Assembler';
+import edu from '../../assets/Edu_Logo_Only-Photoroom.png';
+import text from '../../assets/Edu_Text-Photoroom.png';
 import {faChalkboardUser, faAddressCard, faPowerOff, faBookOpen, faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
 import type { HandleTab } from './Functionality';
 export default function Sidebar( props : HandleTab){
-    const {handleFunc} =  props;
-    return <Section cn='md:w-1/6 h-1/6 flex md:flex-col justify-start items-center md:h-lvh'>
-        <Div cn='w-full flex md:flex-col justify-start items-center h-full md:h-9/10 text-white'>
-            <Span cn='text-2xl w-full md:h-2/10 h-full flex justify-center items-center gv bg-gradient-to-br from-lime-400 via-lime-200 to-white animate-gradient text-shadow-xs text-shadow-black'>EduNexus</Span>
-            <Div cn='md:h-8/10 hidden md:block w-full'>
-                <Button cn='hover:bg-lime-400/75 w-full group text-xl h-1/8 bg-white flex justify-center items-center text-lime-400 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white' onClick={()=> handleFunc("dashboard")}>
+    const {handleFunc, activeTab} =  props;
+    return <Section cn='md:w-1/6 h-1/6 flex md:flex-col justify-start items-center md:h-lvh'> {/* Sidebar Section */}
+        {/* Div Holding Logo & Traversing Navs */}
+        <Div cn='w-full flex md:flex-col justify-start items-center h-full md:h-9/10 text-white bg-black'>
+            {/* Title */}
+            <Span cn='text-xl w-full md:h-1/10 h-full flex justify-center items-center pt-2 gv text-shadow-xs text-shadow-black'>
+                <img src={edu} className='object-cover h-18'></img>
+                <img src={text} className='object-fill h-25'></img>
+            </Span>
+            {/* Nav Links */}
+            <Div cn='md:h-8/10 hidden md:block w-full bg-black'>
+                <Button cn={`hover:bg-cyan-600 w-full group text-xl h-1/8 ${activeTab === "dashboard" && "bg-white border-2 border-black"} flex justify-center items-center text-cyan-600 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:bg-gradient-to-r animate-gradient hover:from-cyan-600 hover:to-cyan-400 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("dashboard")}>
                     <Span cn='text-xl block mr-2'>
                         <FontAwesomeIcon icon={faAddressCard}></FontAwesomeIcon>
                     </Span>
@@ -16,7 +24,7 @@ export default function Sidebar( props : HandleTab){
                         Dashboard
                     </Span>
                 </Button>
-                <Button cn='hover:bg-lime-400/75 w-full group text-xl h-1/8 bg-white flex justify-center items-center text-lime-400 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white' onClick={()=> handleFunc("marks")}>
+                <Button cn={`hover:bg-cyan-600 w-full group text-xl h-1/8 ${activeTab === "marks" && "bg-white border-2 border-black"} flex justify-center items-center text-cyan-600 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:bg-gradient-to-r animate-gradient hover:from-cyan-600 hover:to-cyan-400 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("marks")}>
                     <Span cn='text-xl block mr-2'>
                         <FontAwesomeIcon icon={faBookOpen}></FontAwesomeIcon>
                     </Span>
@@ -24,7 +32,7 @@ export default function Sidebar( props : HandleTab){
                         Marks
                     </Span>
                 </Button>
-                <Button cn='hover:bg-lime-400/75 w-full group text-xl h-1/8 bg-white flex justify-center items-center text-lime-400 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white' onClick={()=> handleFunc("lost&found")}>
+                <Button cn={`hover:bg-cyan-600 w-full group text-xl h-1/8 ${activeTab === "lost&found" && "bg-white border-2 border-black"} flex justify-center items-center text-cyan-600 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:bg-gradient-to-r animate-gradient hover:from-cyan-600 hover:to-cyan-400 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("lost&found")}>
                     <Span cn='text-xl block mr-2'>
                         <FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon>
                     </Span>
@@ -32,7 +40,7 @@ export default function Sidebar( props : HandleTab){
                         Lost & Found
                     </Span>
                 </Button>
-                <Button cn='hover:bg-lime-400/75 w-full group text-xl h-1/8 bg-white flex justify-center items-center text-lime-400 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white' onClick={()=> handleFunc("ptm")}>
+                <Button cn={`hover:bg-cyan-600 w-full group text-xl h-1/8 ${activeTab === "ptm" && "bg-white border-2 border-black"} flex justify-center items-center text-cyan-600 transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:bg-gradient-to-r animate-gradient hover:from-cyan-600 hover:to-cyan-400 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("ptm")}>
                     <Span cn='text-xl block mr-2'>
                         <FontAwesomeIcon icon={faChalkboardUser} />
                     </Span>
@@ -42,7 +50,9 @@ export default function Sidebar( props : HandleTab){
                 </Button>
             </Div>
         </Div>
-        <Div cn='md:h-1/10 h-full hidden'>
+
+        {/* Logout Button */}
+        <Div cn='md:h-1/10 h-full hidden md:block bg-black w-full text-white'>
             <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-500 ease cursor-pointer' onClick={()=>{}}>
                 <Span cn='text-xl block mr-2'>
                     <FontAwesomeIcon icon={faPowerOff} />

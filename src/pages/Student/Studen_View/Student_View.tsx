@@ -8,7 +8,7 @@ import Lost_Found from '../Lost&Found/Lost_Found';
 export default function Student_View(){
     const {activeTab, handleActiveTab} = useStudent();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
-        <Sidebar handleFunc={handleActiveTab}/>
+        <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
         { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
         { activeTab === "marks" && <Marks /> }
         { activeTab === "lost&found" && <Lost_Found /> }
