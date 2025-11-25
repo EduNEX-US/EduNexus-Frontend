@@ -6,17 +6,17 @@ import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 export default function Lost_Found(){
     return <Section cn='md:overflow-y-none overflow-y-auto md:w-5/6 w-full md:h-lvh h-5/6 flex flex-col md:flex-row justify-between'> {/* Lost & Found Section */}
         {/* <Div cn="space-y-6 w-full h-lvh"> */}
-      <Div cn="bg-white overflow-y-auto h-full p-6 shadow-sm w-full">
-        <h2 className="text-3xl font-semibold text-sky-500 text-shadow-sm text-shadow-black mb-6">Lost & Found Items</h2>
+      <Div cn="bg-gradient-to-br from-cyan-300 to-white overflow-y-auto h-full p-6 shadow-sm w-full">
+        <h2 className="text-3xl font-semibold text-slate-950 text-shadow-sm text-shadow-black mb-6">Lost & Found Items</h2>
         {lostFoundItems.length === 0 ? (
           <Div cn="text-center py-12">
             <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
             <p className="text-lime-400">No items in lost & found</p>
           </Div>
         ) : (
-          <Div cn="space-y-4">
+          <Div cn="space-y-4 h-full overflow-y-auto">
             {lostFoundItems.map(item => (
-              <Div key={item.id} cn="bg-black border border-gray-100 rounded-xl p-5 hover:shadow-md transition-shadow">
+              <Div key={item.id} cn="bg-white w-[99%] shadow-sm shadow-gray-400 rounded-xl p-5 hover:shadow-md transition-shadow">
                 <Div cn="flex items-start justify-between">
                   <Div cn="flex-1">
                     <Div cn="flex items-center gap-3">
