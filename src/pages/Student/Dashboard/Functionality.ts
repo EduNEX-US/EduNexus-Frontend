@@ -13,9 +13,9 @@ const studentData = {
 };
 
 const attendanceData = [
-  { name: 'Present', value: 65, color: 'oklch(84.1% 0.238 128.85)' },
-  { name: 'Absent', value: 30, color: '#ef4444' },
-  { name: 'Late', value: 5, color: '#f59e0b' }
+  { name: 'Present', value: 65, color: 'oklch(62.7% 0.194 149.214)' },
+  { name: 'Absent', value: 30, color: 'oklch(63.7% 0.237 25.331)' },
+  { name: 'Late', value: 5, color: 'oklch(64.6% 0.222 41.116)' }
 ];
 
 const recentTests : {id : number, subject : string, date : string, score : number, total : number, grade : string}[] = [

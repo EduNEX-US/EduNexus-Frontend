@@ -36,6 +36,9 @@
   animation: gradient-move 6s ease infinite;
 }
 
+.lt{
+  box-shadow: 5px 5px black;
+}
 
 select {
     appearance: none;

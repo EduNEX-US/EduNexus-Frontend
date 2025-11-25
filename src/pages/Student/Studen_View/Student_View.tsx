@@ -5,8 +5,9 @@ import useStudent from './Functionality';
 import Marks from '../Marks/Marks';
 import Ptm from '../PTM/Ptm';
 import Lost_Found from '../Lost&Found/Lost_Found';
+import useStudentView from './Functionality';
 export default function Student_View(){
-    const {activeTab, handleActiveTab} = useStudent();
+    const {activeTab, handleActiveTab} = useStudentView();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
         <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
         { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
