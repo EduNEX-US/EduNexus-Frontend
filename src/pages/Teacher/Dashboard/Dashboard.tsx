@@ -5,34 +5,34 @@ import { faLocationDot, faPhone, faGraduationCap, faEnvelope, faUsers, faCalenda
 import useFuncs from "./Functionality"
 export default function Dashboard(props : HandleTab){
     const {teacherProfile, ptmMeetings} = useFuncs();
-    return <Section cn="bg-gradient-to-br from-white to-cyan-300 md:w-5/6 flex flex-col items-center space-y-6 p-4 overflow-y-auto"> {/* Parent Section */}
+    return <Section cn="bg-[#7CA982] md:w-5/6 flex flex-col items-center space-y-6 p-4 overflow-y-auto"> {/* Parent Section */}
         <Div  cn="flex justify-between items-center w-[95%] mt-4 h-[40%]"> {/* Greetings Header */}
             {/* Greetings & Qualification */}
-            <Div  cn="h-full w-3/6 flex justify-around items-center h-[25%] bg-cyan-400 rounded-xl">
+            <Div  cn="h-full w-3/6 flex justify-around items-center h-[25%] bg-[#243E36] py-6 rounded-xl">
                 <Div  cn="h-full flex flex-col py-2 items-start justify-center">
-                    <Span cn="rounded-xl w-full flex items-center text-xl font-extrabold">Welcome Back Mr. Aman Kaushik</Span>
-                    <Div  cn="flex justify-start items-center text-sm text-white w-full">
-                        <Span cn="text-center mr-2"><FontAwesomeIcon icon={faGraduationCap}></FontAwesomeIcon></Span>
+                    <Span cn="rounded-xl w-full flex items-center text-xl font-extrabold text-[#7CA982]">Welcome Back Mr. Aman Kaushik</Span>
+                    <Div  cn="flex justify-start items-center text-sm text-[#E0EEC6] w-full">
+                        <Span cn="text-center mr-2 text-[#C2A83E]"><FontAwesomeIcon icon={faGraduationCap}></FontAwesomeIcon></Span>
                         <Span cn="flex justify-start items-center w-4/5">Phd. Computer Science</Span>
                     </Div >
                 </Div >
-                <Span cn="bg-white rounded-[50%] size-20 flex items-center justify-center text-4xl">AK</Span>
+                <Span cn="bg-[#7CA982] text-[#243E36] rounded-[50%] size-20 flex items-center justify-center text-4xl">AK</Span>
             </Div >
             {/* Personal Details */}
             <Div  cn="h-full flex items-center justify-around w-2/5">
-                <Div  cn="grid grid-cols-1 w-full h-full bg-white">
-                    <Span cn="px-4">Personal Details</Span>
+                <Div  cn="grid grid-cols-1 w-full h-full rounded-xl bg-[#243E36]">
+                    <Span cn="px-4 flex items-center text-[#7CA982] font-extrabold">Personal Details</Span>
                     <Div  cn="flex justify-start px-2 items-center">
-                        <Span cn="w-[10%] text-sm text-center"><FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon></Span>
-                        <Span cn="flex justify-start items-center w-[90%] text-sm">abcd@gmail.com</Span>
+                        <Span cn="w-[10%] text-sm text-center text-[#C2A83E] opacity-30"><FontAwesomeIcon icon={faEnvelope}></FontAwesomeIcon></Span>
+                        <Span cn="flex justify-start text-[#E0EEC6] items-center w-[90%] text-sm">abcd@gmail.com</Span>
                     </Div >
                     <Div  cn="flex justify-start px-2 items-center">
-                        <Span cn="w-[10%] text-center text-sm"><FontAwesomeIcon icon={faPhone}></FontAwesomeIcon></Span>
-                        <Span cn="flex justify-start items-center w-[90%] text-sm">1234567890</Span>
+                        <Span cn="w-[10%] text-center text-sm text-[#C2A83E] opacity-30"><FontAwesomeIcon icon={faPhone}></FontAwesomeIcon></Span>
+                        <Span cn="flex justify-start text-[#E0EEC6] items-center w-[90%] text-sm">1234567890</Span>
                     </Div >
                     <Div  cn="flex justify-start px-2 items-center">
-                        <Span cn="w-[10%] text-center"><FontAwesomeIcon icon={faLocationDot}></FontAwesomeIcon></Span>
-                        <Span cn="flex justify-start font-bold items-center w-[90%] text-xs">123, Park ST., MarksTown, Austria</Span>
+                        <Span cn="w-[10%] text-center text-sm text-[#C2A83E] opacity-30"><FontAwesomeIcon icon={faLocationDot}></FontAwesomeIcon></Span>
+                        <Span cn="flex justify-start text-[#E0EEC6] font-bold items-center w-[90%] text-xs">123, Park ST., MarksTown, Austria</Span>
                     </Div >
                 </Div >
             </Div >
@@ -41,43 +41,43 @@ export default function Dashboard(props : HandleTab){
         <Div cn="w-[95%] h-1/4">
             <Div cn="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-around items-center content-center">
                 {/* Number of Students To Teach */}
-                <Div cn="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <Div cn="bg-[#243E36] rounded-lg shadow p-6 border-l-4 border-[#E0EEC6]">
                     <Div cn="flex items-center justify-between">
                         <Div cn="grid grid-cols-1">
-                        <Span cn="text-gray-600 text-sm">Total Students</Span>
-                        <Span cn="text-3xl font-bold text-gray-900">{teacherProfile.totalStudents}</Span>
+                        <Span cn="text-sm text-[#E0EEC6]">Total Students</Span>
+                        <Span cn="text-3xl font-bold text-[#7CA982]">{teacherProfile.totalStudents}</Span>
                         </Div >
-                        <FontAwesomeIcon className="w-12 h-12 text-blue-500 opacity-20" icon={faUsers}/>
+                        <FontAwesomeIcon className="w-12 h-12 text-[#C2A83E] opacity-20" icon={faUsers}/>
                     </Div >
                 </Div >
                 {/* Number of Classes */}
-                <Div  cn="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                <Div  cn="bg-[#243E36] rounded-lg shadow p-6 border-l-4 border-[#E0EEC6]">
                     <Div  cn="flex items-center justify-between">
                         <Div cn="grid grid-cols-1">
-                        <Span cn="text-gray-600 text-sm">Classes</Span>
-                        <Span cn="text-3xl font-bold text-gray-900">{teacherProfile.classes.length}</Span>
+                        <Span cn="text-sm text-[#E0EEC6]">Classes</Span>
+                        <Span cn="text-3xl font-bold text-[#7CA982]">{teacherProfile.classes.length}</Span>
                         </Div >
-                        <FontAwesomeIcon className="w-12 h-12 text-green-500 opacity-20" icon={faBookOpen}/>
+                        <FontAwesomeIcon className="w-12 h-12 text-[#C2A83E] opacity-20" icon={faBookOpen}/>
                     </Div >
                 </Div >
                 {/* Upcoming PTMs */}
-                <Div  cn="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                <Div  cn="bg-[#243E36] rounded-lg shadow p-6 border-l-4  border-[#E0EEC6]">
                 <Div  cn="flex items-center justify-between">
                     <Div cn="grid grid-cols-1">
-                    <Span cn="text-gray-600 text-sm">Upcoming PTMs</Span>
-                    <Span cn="text-3xl font-bold text-gray-900">{ptmMeetings.filter(m => m.status === 'scheduled').length}</Span>
+                    <Span cn="text-sm text-[#E0EEC6]">Upcoming PTMs</Span>
+                    <Span cn="text-3xl font-bold text-[#7CA982]">{ptmMeetings.filter(m => m.status === 'scheduled').length}</Span>
                     </Div >
-                    <FontAwesomeIcon className="w-12 h-12 text-yellow-500 opacity-20" icon={faCalendar}/>
+                    <FontAwesomeIcon className="w-12 h-12 text-[#C2A83E] opacity-20" icon={faCalendar}/>
                 </Div >
                 </Div >
                 {/* Total Experience */}
-                <Div  cn="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+                <Div  cn="bg-[#243E36] rounded-lg shadow p-6 border-l-4  border-[#E0EEC6]">
                 <Div  cn="flex items-center justify-between">
                     <Div cn="grid grid-cols-1">
-                    <Span cn="text-gray-600 text-sm">Experience</Span>
-                    <Span cn="text-3xl font-bold text-gray-900">{teacherProfile.experience}</Span>
+                    <Span cn="text-sm text-[#E0EEC6]">Experience</Span>
+                    <Span cn="text-3xl font-bold text-[#7CA982]">{teacherProfile.experience}</Span>
                     </Div >
-                    <FontAwesomeIcon className="w-12 h-12 text-purple-500 opacity-20" icon={faAward}/>
+                    <FontAwesomeIcon className="w-12 h-12 text-[#C2A83E] opacity-20" icon={faAward}/>
                 </Div >
                 </Div >
             </Div >
@@ -85,19 +85,19 @@ export default function Dashboard(props : HandleTab){
         {/* Schedule Div */}
         <Div cn="w-[95%]">
             {/* Today's Schedule */}
-            <Div cn="bg-white rounded-lg p-6 w-full">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Today's Schedule</h2>
+            <Div cn="bg-[#243E36] rounded-lg p-6 w-full">
+                <h2 className="text-xl font-bold text-[#7CA982] mb-4">Today's Schedule</h2>
                 <Div cn="space-y-4">
                     {teacherProfile.classes.map((cls, idx) => (
-                    <Div key={idx} cn="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
-                        <Div cn="w-12 h-12 bg-cyan-600 rounded-lg flex items-center justify-center text-white font-bold">
+                    <Div key={idx} cn="flex items-center gap-4 p-3 bg-[#E0EEC6] rounded-lg">
+                        <Div cn="w-12 h-12 bg-[#243E36] rounded-lg flex items-center justify-center text-[#7CA982] font-bold">
                         {idx + 1}
                         </Div>
                         <Div cn="flex-1 flex flex-col">
-                        <Span cn="font-semibold text-gray-900">{cls}</Span>
-                        <Span cn="text-sm text-gray-600">Period {idx + 1} • {9 + idx}:00 - {10 + idx}:00 AM</Span>
+                        <Span cn="font-semibold text-[#243E36]">{cls}</Span>
+                        <Span cn="text-sm text-[#7CA982]">Period {idx + 1} • {9 + idx}:00 - {10 + idx}:00 AM</Span>
                         </Div>
-                        <FontAwesomeIcon icon={faClock} className="w-5 h-5 text-gray-400" />
+                        <FontAwesomeIcon icon={faClock} className="w-5 h-5 text-[#C2A83E]" />
                     </Div>
                     ))}
                 </Div>
@@ -105,25 +105,25 @@ export default function Dashboard(props : HandleTab){
         </Div>
         <Div cn="w-[95%]">
             {/* Pending Tasks */}
-            <Div cn="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Pending Tasks</h2>
+            <Div cn="bg-[#243E36] rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-[#7CA982] mb-4">Pending Tasks</h2>
             <Div cn="space-y-3">
-                <Div cn="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-                <FontAwesomeIcon icon={faBookOpen} className="w-5 h-5 text-yellow-600" />
+                <Div cn="flex items-center gap-3 p-3 bg-[#E0EEC6] rounded-lg border-l-4 border-[#7CA982]">
+                <FontAwesomeIcon icon={faBookOpen} className="w-5 h-5 text-[#C2A83E]" />
                 <Div cn="flex-1">
                     <Span cn="font-semibold text-gray-900">Upload Mid-Term Marks</Span>
                     <Span cn="text-sm text-gray-600">Class 10A - 5 students pending</Span>
                 </Div>
                 </Div>
-                <Div cn="flex items-center gap-3 p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
-                <FontAwesomeIcon icon={faCalendar} className="w-5 h-5 text-green-600" />
+                <Div cn="flex items-center gap-3 p-3 bg-[#E0EEC6] rounded-lg border-l-4 border-[#7CA982]">
+                <FontAwesomeIcon icon={faCalendar} className="w-5 h-5 text-[#C2A83E]" />
                 <Div cn="flex-1">
                     <Span cn="font-semibold text-gray-900">PTM with Emma's Parents</Span>
                     <Span cn="text-sm text-gray-600">Tomorrow at 11:00 AM</Span>
                 </Div>
                 </Div>
-                <Div cn="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                <FontAwesomeIcon icon={faBoxesPacking} className="w-5 h-5 text-blue-600" />
+                <Div cn="flex items-center gap-3 p-3 bg-[#E0EEC6] rounded-lg border-l-4 border-[#7CA982]">
+                <FontAwesomeIcon icon={faBoxesPacking} className="w-5 h-5 text-[#C2A83E]" />
                 <Div cn="flex-1">
                     <Span cn="font-semibold text-gray-900">Review Lost Item Claims</Span>
                     <Span cn="text-sm text-gray-600">3 items have pending claims</Span>
@@ -134,28 +134,28 @@ export default function Dashboard(props : HandleTab){
         </Div>
 
         <Div cn="w-[95%]">
-            <Div cn="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Class Performance Overview</h2>
+            <Div cn="bg-[#243E36] rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold text-[#7CA982] mb-4">Class Performance Overview</h2>
                 <Div cn="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Div cn="text-center p-4 bg-green-50 rounded-lg">
-                        <Span cn=""><FontAwesomeIcon icon={faArrowTrendUp} className="text-xl text-green-600 " /></Span>
+                    <Div cn="text-center p-4 bg-[#E0EEC6] rounded-lg">
+                        <Span cn=""><FontAwesomeIcon icon={faArrowTrendUp} className="text-xl text-[#C2A83E]" /></Span>
                         <Div cn="">
-                            <Span cn="text-2xl font-bold text-gray-900">87%</Span>
-                            <Span cn="text-sm text-gray-600 ml-2">Average Pass Rate</Span>
+                            <Span cn="text-2xl font-bold text-[#243E36]">87%</Span>
+                            <Span cn="text-sm text-[#7CA982] ml-2">Average Pass Rate</Span>
                         </Div>
                     </Div>
-                    <Div cn="text-center p-4 bg-blue-50 rounded-lg">
-                        <Span cn=""><FontAwesomeIcon icon={faAward} className="text-xl text-blue-600" /></Span>
+                    <Div cn="text-center p-4 bg-[#E0EEC6] rounded-lg">
+                        <Span cn=""><FontAwesomeIcon icon={faAward} className="text-xl text-[#C2A83E]" /></Span>
                         <Div cn="">
-                            <Span cn="text-2xl font-bold text-gray-900">78.5</Span>
-                            <Span cn="text-sm text-gray-600 ml-2">Class Average</Span>
+                            <Span cn="text-2xl font-bold text-[#243E36]">78.5</Span>
+                            <Span cn="text-sm text-[#7CA982] ml-2">Class Average</Span>
                         </Div>
                     </Div>
-                    <Div cn="text-center p-4 bg-purple-50 rounded-lg">
-                        <Span cn=""><FontAwesomeIcon icon={faUsers} className="text-xl text-purple-600" /></Span>
+                    <Div cn="text-center p-4 bg-[#E0EEC6] rounded-lg">
+                        <Span cn=""><FontAwesomeIcon icon={faUsers} className="text-xl text-[#C2A83E]" /></Span>
                         <Div cn="">
-                            <Span cn="text-2xl font-bold text-gray-900">12</Span>
-                            <Span cn="text-sm text-gray-600 ml-2">Top Performers</Span>
+                            <Span cn="text-2xl font-bold text-[#243E36]">12</Span>
+                            <Span cn="text-sm text-[#7CA982] ml-2">Top Performers</Span>
                         </Div>
                     </Div>
                 </Div>

@@ -1,12 +1,11 @@
 import { useEffect} from 'react';
 import {Section, Div, Input, Button, Span} from '../../Components/Assembler';
-// import edu from '../../assets/EduNexusLogo.png';
 import edu from '../../assets/EduNexUsBW-Photoroom.png';
 import useFuncs from './Functionality';
 import { faEye } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 export default function Login(){
-    const {idRef, passRef, role, handleRole, passType, handlePassType, timerRef, images, pointer, emptyfield, handleEmptyField, handleLogin, handlePointer} = useFuncs();
+    const {idRef, passRef, role, handleRole, passType, handlePassType, images, pointer, emptyfield, handleEmptyField, handleLogin, handlePointer} = useFuncs();
 
     useEffect(()=>{
         const emptyTimeOut = setTimeout(()=>{
