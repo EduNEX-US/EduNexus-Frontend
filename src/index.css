@@ -44,6 +44,30 @@ select {
     appearance: none;
 }
 
+/* ...existing code... */
+
+/* Remove number input spinners (Chrome / Edge / Safari) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove spinner in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield; /* fallback */
+}
+
+/* optional: keep layout unaffected when hiding controls */
+input[type="number"] {
+  /* you already had appearance:none; keep or replace with above */
+}
+
+.teach tbody > tr:nth-child(even){
+  background-color: #243E36;
+}
+/* ...existing code... */
 ::-webkit-scrollbar{
   scrollbar-width: thin;
   scrollbar-color: oklch(84.1% 0.238 128.85);
