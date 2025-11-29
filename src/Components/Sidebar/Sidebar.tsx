@@ -8,52 +8,64 @@ export default function Sidebar( props : HandleTab){
     const {handleFunc, activeTab} =  props;
     return <Section cn='md:w-1/6 h-1/6 flex md:flex-col justify-start items-center md:h-lvh'> {/* Sidebar Section */}
         {/* Div Holding Logo & Traversing Navs */}
-        <Div cn='w-full flex md:flex-col justify-start items-center h-full md:h-9/10 text-white bg-[#243E36]'>
+        <Div cn='w-full flex md:flex-col justify-start items-center h-full md:h-9/10 text-white bg-purple-400'>
             {/* Title */}
-            <Span cn='text-xl w-full md:h-[15%] h-full flex bg-[#243E36] justify-center items-center pt-2 gv text-shadow-xs text-shadow-black'>
+            <Span cn='text-xl w-full md:h-[15%] h-full flex bg-purple-400 justify-center items-center pt-2 gv text-shadow-xs text-shadow-black'>
                 <img src={edu} className='object-cover h-18'></img>
                 <img src={text} className='object-fill h-25'></img>
             </Span>
             {/* Nav Links */}
-            <Div cn='md:h-8/10 hidden md:block w-full bg-[#243E36]'>
-                <Button cn={`hover:bg-[#E0EEC6] w-full group text-xl h-1/8 ${activeTab === "dashboard" && "bg-[#E0EEC6]"} flex justify-center items-center text-[#F1F7ED] transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("dashboard")}>
-                    <Span cn={`text-xl block mr-2 ${activeTab === "dashboard" ? "text-[#243E36]" : "text-[#E0EEC6]"} group-hover:text-[#243E36]`}>
+            <Div cn='md:flex md:flex-col items-center md:h-8/10 hidden w-full bg-purple-400'>
+                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "dashboard" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("dashboard")}>
+                    <Span cn={`text-xl block mr-2 ${activeTab === "dashboard" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
                         <FontAwesomeIcon icon={faAddressCard}></FontAwesomeIcon>
                     </Span>
-                    <Span cn='text-xl hidden group-hover:block group-hover:text-[#243E36]'>
+                    <Span cn='text-xl hidden group-hover:block group-hover:text-purple-400'>
                         Dashboard
                     </Span>
+                    {activeTab === "dashboard" && <Span cn='text-xl group-hover:hidden text-purple-400'>
+                        Dashboard
+                    </Span>}
                 </Button>
-                <Button cn={`hover:bg-[#E0EEC6] w-full group text-xl h-1/8 ${activeTab === "marks" && "bg-[#E0EEC6]"} flex justify-center items-center text-[#F1F7ED] transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("marks")}>
-                    <Span cn={`text-xl block mr-2 ${activeTab === "marks" ? "text-[#243E36]" : "text-[#E0EEC6]"} group-hover:text-[#243E36]`}>
+                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "marks" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("marks")}>
+                    <Span cn={`text-xl block mr-2 ${activeTab === "marks" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
                         <FontAwesomeIcon icon={faBookOpen}></FontAwesomeIcon>
                     </Span>
-                    <Span cn='text-xl hidden group-hover:block'>
-                        Marks
+                    <Span cn='text-xl hidden group-hover:block group-hover:text-purple-400'>
+                        Manage
                     </Span>
+                    {activeTab === "marks" && <Span cn='text-xl group-hover:hidden group-hover:block text-purple-400'>
+                        Manage
+                    </Span>}
                 </Button>
-                <Button cn={`hover:bg-[#E0EEC6] w-full group text-xl h-1/8 ${activeTab === "lost&found" && "bg-[#E0EEC6]"} flex justify-center items-center text-[#F1F7ED] transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("lost&found")}>
-                    <Span cn={`text-xl block mr-2 ${activeTab === "lost&found" ? "text-[#243E36]" : "text-[#E0EEC6]"} group-hover:text-[#243E36]`}>
+                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "lost&found" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("lost&found")}>
+                    <Span cn={`text-xl block mr-2 ${activeTab === "lost&found" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
                         <FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon>
                     </Span>
-                    <Span cn='text-xl hidden group-hover:block'>
-                        Lost & Found
+                    <Span cn='text-xl hidden group-hover:block group-hover:text-purple-400'>
+                        Register Users
                     </Span>
+                    {activeTab === "lost&found" && <Span cn='text-xl group-hover:hidden group-hover:block text-purple-400'>
+                        Register Users
+                    </Span>}
                 </Button>
-                <Button cn={`hover:bg-[#E0EEC6] w-full group text-xl h-1/8 ${activeTab === "ptm" && "bg-[#E0EEC6]"} flex justify-center items-center text-[#F1F7ED] transition transition-all duration-500 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("ptm")}>
-                    <Span cn={`text-xl block mr-2 ${activeTab === "ptm" ? "text-[#243E36]" : "text-[#E0EEC6]"} group-hover:text-[#243E36]`}>
+                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "ptm" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("ptm")}>
+                    <Span cn={`text-xl block mr-2 ${activeTab === "ptm" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
                         <FontAwesomeIcon icon={faChalkboardUser} />
                     </Span>
-                    <Span cn='text-xl hidden group-hover:block'>
+                    <Span cn='text-xl hidden group-hover:block group-hover:text-purple-400'>
                         PTM
                     </Span>
+                    {activeTab === "ptm" && <Span cn='text-xl group-hover:hidden group-hover:block text-purple-400'>
+                        PTM
+                    </Span>}
                 </Button>
             </Div>
         </Div>
 
         {/* Logout Button */}
-        <Div cn='md:h-1/10 h-full hidden md:block bg-[#243E36] w-full text-[#F1F7ED]'>
-            <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-500 ease cursor-pointer' onClick={()=>{}}>
+        <Div cn='md:h-1/10 h-full hidden md:block bg-purple-400 w-full text-white'>
+            <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={()=>{}}>
                 <Span cn='text-xl block mr-2'>
                     <FontAwesomeIcon icon={faArrowRightFromBracket} />
                 </Span>

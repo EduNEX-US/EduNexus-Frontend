@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Button, Section, Div, Span} from '../../../Components/Assembler';
 import edu from '../../../assets/Edu_Logo_Only-Photoroom.png';
-import text from '../../../assets/Edu_Text-Photoroom.png';
+import text from '../../../assets/black-Photoroom-cpy.png';
 import {faChalkboardUser, faAddressCard, faPen, faUser, faArrowRightFromBracket} from '@fortawesome/free-solid-svg-icons'
 import type { HandleTab } from './Functionality';
 export default function Sidebar( props : HandleTab){
@@ -12,7 +12,7 @@ export default function Sidebar( props : HandleTab){
             {/* Title */}
             <Span cn='text-xl w-full md:h-[15%] h-full flex bg-purple-400 justify-center items-center pt-2 gv text-shadow-xs text-shadow-black'>
                 <img src={edu} className='object-cover h-18'></img>
-                <img src={text} className='object-fill h-25'></img>
+                <img src={text} className='object-stretch w-1/2 border-2 h-25'></img>
             </Span>
             {/* Nav Links */}
             <Div cn='md:flex md:flex-col items-center md:h-8/10 hidden w-full bg-purple-400'>

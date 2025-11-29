@@ -74,11 +74,13 @@ input[type="number"] {
 }
 
 tr:nth-child(even) {
-  background-color: oklch(78.9% 0.154 211.53);
+  background-color: oklch(71.4% 0.203 305.504);
+  color: white;
 }
 
 tbody>tr:nth-child(odd) {
-  background-color: oklch(86.9% 0.005 56.366);
+  background-color: oklch(100% 0.00011 271.152);
+  color: oklch(71.4% 0.203 305.504);
 }
 
 .role tbody > tr:nth-child(odd){

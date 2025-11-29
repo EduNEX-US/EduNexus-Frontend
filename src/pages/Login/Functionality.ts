@@ -1,7 +1,4 @@
 import { useRef, useState } from "react";
-import g1 from '../../assets/G-1.jpg';
-import g2 from '../../assets/G-2.jpg';
-import g3 from '../../assets/G-3.jpg';
 type Role = "student" | "admin" | "teacher";
 export default function useFuncs(){
     const idRef = useRef<HTMLInputElement>(null);
@@ -11,13 +8,6 @@ export default function useFuncs(){
     const [passType, setPassType] = useState<"text" | "password">("password");
     const [emptyfield, setEmptyField] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
-    const images = [g1, g2, g3]; // Array of Images
-    const [pointer, setPointer] = useState<number>(0); // Pointer for selecting the image
-
-    // Handling The Pointer for Image representation Via Carousel
-    function handlePointer(){
-        setPointer(prev => (prev+1)%images.length);
-    }
 
     function handleLogin(){
         console.log(passRef.current?.value);
@@ -38,5 +28,5 @@ export default function useFuncs(){
     function handleError(val : string){
         setError(val);
     }
-    return {idRef, timerRef, passRef, role, handleRole, setRole, passType, handlePassType, emptyfield, handleEmptyField, images, pointer, handlePointer, handleLogin};
+    return {idRef, timerRef, passRef, role, handleRole, setRole, passType, handlePassType, emptyfield, handleEmptyField, handleLogin};
 }

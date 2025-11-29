@@ -15,7 +15,7 @@ const studentData = {
 const attendanceData = [
   { name: 'Present', value: 65, color: 'oklch(62.7% 0.194 149.214)' },
   { name: 'Absent', value: 30, color: 'oklch(63.7% 0.237 25.331)' },
-  { name: 'Late', value: 5, color: 'oklch(64.6% 0.222 41.116)' }
+  { name: 'Late', value: 5, color: 'oklch(55.4% 0.046 257.417)' }
 ];
 
 const recentTests : {id : number, subject : string, date : string, score : number, total : number, grade : string}[] = [
@@ -25,9 +25,9 @@ const recentTests : {id : number, subject : string, date : string, score : numbe
 ];
 
 const getGradeColor = (grade : string) => {
-    if (grade.startsWith('A')) return 'text-emerald-600 bg-emerald-50';
-    if (grade.startsWith('B')) return 'text-blue-600 bg-blue-50';
-    if (grade.startsWith('C')) return 'text-amber-600 bg-amber-50';
+    if (grade.startsWith('A')) return 'text-emerald-600 bg-emerald-200';
+    if (grade.startsWith('B')) return 'text-blue-600 bg-blue-200';
+    if (grade.startsWith('C')) return 'text-amber-600 bg-amber-200';
     return 'text-red-600 bg-red-50';
 };
 
