@@ -3,7 +3,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import Register_Users from '../Register_Users/Register_Users';
 import Sidebar from '../Sidebar/Sidebar';
 import useAdminView from './Functionality';
-
+import PTM from '../PTM/PTM';
 export default function Admin_View(){
     const {activeTab, handleActiveTab} = useAdminView();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
@@ -11,6 +11,6 @@ export default function Admin_View(){
         { activeTab === "dashboard" && <Dashboard /> }
         {/* { activeTab === "manage" && <Marks /> } */}
         { activeTab === "register users" && <Register_Users /> }
-        {/* { activeTab === "ptm" && <Ptm /> } */}
+        { activeTab === "ptm" && <PTM /> }
     </Section>
 }

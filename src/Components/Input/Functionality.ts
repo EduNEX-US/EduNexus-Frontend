@@ -9,5 +9,6 @@ export interface InputProps{
     onChange? : (e : ChangeEvent<HTMLInputElement>) => void,
     inpTxt : string,
     inpCN : string,
-    value? : string
+    value? : string,
+    disabled? : boolean
 }

@@ -1,6 +1,6 @@
 import type { ButtonProps } from "./Functionality";
 
 export default function Button(props : ButtonProps){
-    const {cn, children, onClick} = props;
-    return <button className={cn} onClick={onClick}>{children}</button>
+    const {cn, children, disabled, onClick} = props;
+    return <button className={cn} disabled={disabled} onClick={onClick}>{children}</button>
 }
