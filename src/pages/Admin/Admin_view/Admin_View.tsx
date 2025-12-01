@@ -4,12 +4,13 @@ import Register_Users from '../Register_Users/Register_Users';
 import Sidebar from '../Sidebar/Sidebar';
 import useAdminView from './Functionality';
 import PTM from '../PTM/PTM';
+import Lost_Found from '../Lost&Found/Lost_Found';
 export default function Admin_View(){
     const {activeTab, handleActiveTab} = useAdminView();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
         <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
         { activeTab === "dashboard" && <Dashboard /> }
-        {/* { activeTab === "manage" && <Marks /> } */}
+        { activeTab === "lost&found" && <Lost_Found /> }
         { activeTab === "register users" && <Register_Users /> }
         { activeTab === "ptm" && <PTM /> }
     </Section>

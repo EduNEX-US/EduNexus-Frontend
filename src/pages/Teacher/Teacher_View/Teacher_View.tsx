@@ -1,8 +1,8 @@
 import useTeacherView from "./Functionality";
-import Sidebar from "../../Components/Sidebar/Sidebar";
-import { Section } from "../../Components/Assembler";
-import Dashboard from "./Dashboard/Dashboard";
-import Marks from "./Marks/Marks";
+import Sidebar from "../../../Components/Sidebar/Sidebar";
+import { Section } from "../../../Components/Assembler";
+import Dashboard from "../Dashboard/Dashboard";
+import Marks from "../Marks/Marks";
 export default function Teacher_View(){
     const {activeTab, handleActiveTab} = useTeacherView();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>

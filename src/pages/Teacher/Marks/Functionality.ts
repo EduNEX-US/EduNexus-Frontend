@@ -104,5 +104,13 @@ export default function useFuncs(){
   }
 ]
 
-    return {markForm, handleMarkForm, state, dispatch, primary, setPrimary, dummyData};
+const [search , setSearch] = useState<string>("");
+  const handleSearch = (val : string)=>{
+    setSearch(val);
+  }
+
+  const filteredStudents = dummyData.filter(d => {
+    d.name.toLowerCase().includes(search.toLowerCase());
+  })
+    return {markForm, handleMarkForm, state, dispatch, primary, setPrimary, handleSearch, dummyData, filteredStudents};
 }
