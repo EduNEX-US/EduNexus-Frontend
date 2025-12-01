@@ -76,7 +76,7 @@ const totalPossible = allMarks[selectedExam].reduce((a :  number, m : MarkEntry)
                   <tr key={i} className="text-xs border-b border-gray-50 hover:bg-gray-50">
                     <td className="md:py-3 py-2 pl-2 md:px-4 font-medium">{m.subject}</td>
                     <td className="md:py-3 py-2 md:px-4 text-center whitespace-nowrap">{m.score} / {m.total}</td>
-                    <td className="md:py-3 py-2 md:px-4 text-center"><div className="flex items-center justify-center gap-2"><div className="w-20 bg-gray-100 rounded-full h-2 hidden md:block"><div className="bg-indigo-500 h-2 rounded-full hidden md:block" style={{ width: `${calculatePercentage(m.score, m.total)}%` }} /></div><span className="text-sm text-gray-600">{calculatePercentage(m.score, m.total)}%</span></div></td>
+                    <td className="md:py-3 py-2 md:px-4 text-center"><div className="flex items-center justify-center gap-2"><div className="w-20 bg-gray-400 rounded-full h-2 hidden md:block"><div className="bg-indigo-500 h-2 rounded-full hidden md:block" style={{ width: `${calculatePercentage(m.score, m.total)}%` }} /></div><span className="text-sm text-gray-600">{calculatePercentage(m.score, m.total)}%</span></div></td>
                     <td className="md:py-3 py-2 md:px-4 text-center"><span className={`md:px-3 px-1 py-1 rounded-full text-xs font-semibold ${getGradeColor(m.grade)}`}>{m.grade}</span></td>
                   </tr>
                 ))}

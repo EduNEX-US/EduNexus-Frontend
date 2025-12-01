@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-export type active = "dashboard" | "manage" | "register users" | "ptm";
+export type active = "dashboard" | "lost&found" | "register users" | "ptm";
 export default function useAdminView(){
   const [activeTab, setActiveTab] = useState<active>("dashboard");
 
