@@ -14,7 +14,7 @@ export default function Sidebar( props : HandleTab){
                 <img src={text} className='object-cover size-3/4 absolute'></img>
             </Span>
             {/* Nav Links */}
-            <Div cn='md:flex md:flex-col items-center md:h-8/10 hidden w-full bg-purple-400'>
+            <Div cn='md:flex md:flex-col items-center md:h-8/10 hidden w-full'>
                 <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "dashboard" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("dashboard")}>
                     <Span cn={`text-xl block mr-2 ${activeTab === "dashboard" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
                         <FontAwesomeIcon icon={faAddressCard}></FontAwesomeIcon>
