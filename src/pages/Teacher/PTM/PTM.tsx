@@ -5,14 +5,14 @@ export default function PTM(){
     const {selectedStudent, selectedClass, selectedDate, selectedTime, viewMode, students, teacherClasses, scheduledPTMs, completedPTMs, handleSelectedStudent, handleSelectedClass, handleSelectedDate, handleSelectedTime, handleViewMode, handleJoinPTM, fetchStudents, handleSchedule} = useFuncs();
     return <Section cn="flex-1 p-10 overflow-auto bg-white">
 
-        <Span cn="text-3xl font-semibold mb-8">PTM Management (Teacher)</Span>
+        <Span cn="text-3xl font-semibold ">PTM Management (Teacher)</Span>
 
         {/* Scheduling Block */}
-        <Div cn="rounded-2xl shadow-md border p-6 mb-10 bg-white">
-          <Span cn="text-xl font-semibold mb-4">Schedule PTM</Span>
+        <Div cn="rounded-2xl shadow-md border p-6 mb-10 mt-4 bg-white">
+          <Span cn="text-xl font-semibold">Schedule PTM</Span>
 
           {/* Class Selection */}
-          <label className="block font-semibold mb-2">Select Class</label>
+          <label className="block font-semibold my-2">Select Class</label>
           <select
             className="p-3 border rounded w-64 mb-6"
             value={selectedClass}
@@ -84,19 +84,21 @@ export default function PTM(){
           <Span cn="text-xl font-semibold mb-4">Your PTMs</Span>
 
           {/* Toggle Buttons */}
-          <Div cn="relative w-64 bg-gray-300 rounded-full h-10 flex items-center p-1 mb-6">
-            {/* Sliding highlight */}
+          <Div cn="relative w-64 bg-gray-300 rounded-full h-10 flex items-center mt-4 mb-6 overflow-hidden">
+            {/* Sliding highlight (full height) */}
             <div
-              className={`absolute h-8 w-1/2 rounded-full transition-all duration-300 bg-primary-400`}
+              className="absolute inset-y-0 w-1/2 rounded-full transition-all duration-300 bg-purple-400"
               style={{
-                left: viewMode === "upcoming" ? "2px" : "calc(50% - 2px)",
+                left: viewMode === "upcoming" ? "0%" : "50%",
               }}
             ></div>
 
             {/* Upcoming */}
             <Button
               onClick={() => handleViewMode("upcoming")}
-              cn={`z-10 w-1/2 text-center font-semibold transition-colors duration-300 ${viewMode === "upcoming" ? "text-white" : "text-black"}`}
+              cn={`z-10 w-1/2 h-full text-center font-semibold transition-colors duration-300 ${
+                viewMode === "upcoming" ? "text-white" : "text-black cursor-pointer"
+              }`}
             >
               Upcoming
             </Button>
@@ -104,7 +106,9 @@ export default function PTM(){
             {/* Completed */}
             <Button
               onClick={() => handleViewMode("completed")}
-              cn={`z-10 w-1/2 text-center font-semibold transition-colors duration-300 ${viewMode === "completed" ? "text-white" : "text-black"}`}
+              cn={`z-10 w-1/2 h-full text-center font-semibold transition-colors duration-300 ${
+                viewMode === "completed" ? "text-white" : "text-black cursor-pointer"
+              }`}
             >
               Completed
             </Button>
@@ -134,7 +138,7 @@ export default function PTM(){
                   <td className="p-3">
                     {ptm.status === "scheduled" ? (
                       <Button
-                        cn="px-4 py-1 rounded text-white bg-primary-400"
+                        cn="px-4 py-1 rounded text-white bg-purple-400 cursor-pointer hover:bg-purple-700/25"
                         onClick={() => handleJoinPTM(ptm.id)}
                       >
                         Join
