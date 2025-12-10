@@ -28,5 +28,7 @@ export default function useFuncs(){
     function handleError(val : string){
         setError(val);
     }
+
+    
     return {idRef, timerRef, passRef, role, handleRole, setRole, passType, handlePassType, emptyfield, handleEmptyField, handleLogin};
 }

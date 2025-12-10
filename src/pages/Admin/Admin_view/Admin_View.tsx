@@ -6,10 +6,10 @@ import useAdminView from './Functionality';
 import PTM from '../PTM/PTM';
 import Lost_Found from '../Lost&Found/Lost_Found';
 export default function Admin_View(){
-    const {activeTab, handleActiveTab} = useAdminView();
-    return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
-        <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
-        { activeTab === "dashboard" && <Dashboard /> }
+    const {activeTab, barsVisibility, handleActiveTab, handleBarsVisibility} = useAdminView();
+    return <Section cn='w-full h-screen flex md:flex-row flex-col overflow-x-hidden'>
+        <Sidebar handleFunc={handleActiveTab} barsVisibility={barsVisibility} handleBarsVisibility={handleBarsVisibility} activeTab={activeTab}/>
+        { activeTab === "dashboard" && <Dashboard barsVisibility={barsVisibility} handleBarsVisibility={handleBarsVisibility} /> }
         { activeTab === "lost&found" && <Lost_Found /> }
         { activeTab === "register users" && <Register_Users /> }
         { activeTab === "ptm" && <PTM /> }
