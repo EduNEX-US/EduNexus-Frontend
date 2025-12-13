@@ -33,14 +33,14 @@ export default function Sidebar( props : HandleTab){
                         Dashboard
                     </Span>}
                 </Button>
-                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "register users" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc!("register users")}>
+                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group h-1/8 ${activeTab === "register users" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc!("register users")}>
                     <Span cn={`text-sm lg:text-xl block mr-2 ${activeTab === "register users" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
                         <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>
                     </Span>
                     <Span cn='text-sm lg:text-xl hidden group-hover:block group-hover:text-purple-400'>
                         Register Users
                     </Span>
-                    {activeTab === "register users" && <Span cn='text-sm lg:text-xl group-hover:hidden group-hover:block text-purple-400'>
+                    {activeTab === "register users" && <Span cn='text-sm lg:text-lg group-hover:hidden group-hover:block text-purple-400'>
                         Register Users
                     </Span>}
                 </Button>

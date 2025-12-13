@@ -38,7 +38,7 @@ export default function useFuncs(){
       body: noticeBody,
       date: new Date().toISOString().split("T")[0]
     };
-
+    handleNotices(newNotice);
     const res = fetch("http://localhost:8080/notice", {
         headers : {
             "Content-Type" : "application/json"

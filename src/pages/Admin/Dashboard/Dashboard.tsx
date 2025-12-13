@@ -6,7 +6,9 @@ import type { HandleTab } from '../Sidebar/Functionality';
 export default function Dashboard(props : HandleTab){
     const {barsVisibility, handleBarsVisibility} = props;
     const {adminInfo, noticeTitle, noticeBody, notices, handleNoticeBody, handleNoticeTitle, handlePostNotice} = useFuncs()
-    return <Section cn="flex md:flex-row flex-col items-start justify-between h-screen md:w-5/6 gap-y-8 p-3 md:pb-0 md:pt-6 overflow-y-auto md:overflow-y-hidden bg-white" onClick={handleBarsVisibility}>
+    return <Section cn="flex md:flex-row flex-col items-start justify-between h-screen md:w-5/6 gap-y-8 p-3 md:pb-0 md:pt-6 overflow-y-auto md:overflow-y-hidden bg-white" onClick={()=>{
+        window.innerWidth < 768 && handleBarsVisibility!();
+    }}>
         {/* Left/Starting DIV */}
         <Div cn='md:w-2/3 order-2 md:order-1 w-full h-full'>
             {/* DashBoard Title */}
@@ -39,7 +41,10 @@ export default function Dashboard(props : HandleTab){
                     <Button
                     disabled={!noticeTitle || !noticeBody}
                     cn={`px-3 md:px-6 py-2 text-sm md:text-lg rounded text-white ${(!noticeTitle || !noticeBody) ? "bg-gray-400" : " bg-purple-400"}`}
-                    onClick={handlePostNotice}
+                    onClick={(e)=>{
+                        e.stopPropagation();
+                        handlePostNotice();
+                    }}
                     >
                     Post Notice
                     </Button>

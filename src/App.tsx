@@ -4,6 +4,7 @@ import {createBrowserRouter, RouterProvider} from 'react-router'
 import Student_View from './pages/Student/Studen_View/Student_View'
 import Teacher_View from './pages/Teacher/Teacher_View/Teacher_View'
 import Admin_View from './pages/Admin/Admin_view/Admin_View'
+import VideoCaller from './pages/Student/PTM/VideoCaller'
 const router = createBrowserRouter([
   {
     path : '/',
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path : '/edu-admin',
     element : <Admin_View />
+  },
+  {
+    path : '/ptm',
+    element : <VideoCaller />
   }
 ])
 function App() {
