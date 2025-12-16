@@ -69,7 +69,7 @@ export default function Marks(){
     }
     <Div cn='flex justify-between w-[95%]'>
         <Div cn='flex w-2/5'>
-            <Span cn='w-full text-3xl flex items-center text-[#243E36]'>Manage Marks</Span>
+            <Span cn='w-full text-3xl font-semibold flex items-center text-[#243E36]'>Manage Marks</Span>
         </Div>
         <Div cn='flex justify-end w-2/5'>
             <Button cn='p-3 text-purple-400 text-lg border-2 border-purple-400 hover:bg-purple-400 hover:text-white cursor-pointer text-[#7CA982] rounded-lg' onClick={()=>handleMarkForm(true)}>Upload</Button>

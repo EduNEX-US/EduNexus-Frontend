@@ -1,8 +1,16 @@
 import {useState, useEffect} from 'react';
 
 export type notice = {id : string, title : string, body : string, date : string};
+export type admin = {name : string, email : string, mobile : string, role : string, address : string};
 export default function useFuncs(){
-    const [noticeTitle, setNoticeTitle] = useState<string>("");
+  const [adminDetails, setAdminDetails] = useState<admin>({
+     name: "",
+    email: "",
+    mobile: "",
+    role: "Ad",
+    address: "",
+  });
+  const [noticeTitle, setNoticeTitle] = useState<string>("");
   const [noticeBody, setNoticeBody] = useState<string>("");
   const [notices, setNotices] = useState<notice[]>([
     { id: "1", title: "Holiday Notice", body: "School will remain closed on Friday.", date: "2025-01-10" }
@@ -19,6 +27,17 @@ export default function useFuncs(){
     role: "Administrator",
     address: "School Campus, Block A",
   };
+
+  async function handleAdminInfo() {
+    const res = await fetch("http://localhost:8080/admin/profile");
+    const data = await res.json();
+    if(res.ok) {
+      setAdminDetails(data);
+    }
+    else {
+      console.log("Error fetching admin info:", data.error);
+    }
+  }
 
   async function handleGetNotices(){
     try{
