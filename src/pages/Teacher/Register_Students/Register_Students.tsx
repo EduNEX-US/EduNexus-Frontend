@@ -3,13 +3,13 @@ import useFuncs from "./Functionality"
 export default function Register_Students(){
     const {teacherClasses, studentName, studentPass, studentEmail, studentMobile, studentAddress, studentGuardian, studentAltMobile, basicFee, selectedClassForCreate, students, filterClass, visibleStudents, handleStudentName, handleStudentPass, handleStudentEmail, handleStudentMobile, handleStudentAltMobile, handleStudentAddress, handleStudentGuardian, handleBasicFee, handleSelectedClassForCreate, handleFilterClass, handleCreateStudent} = useFuncs();
     return <Section cn="flex-1 p-10 overflow-auto bg-white">
-        <Span cn="text-3xl font-semibold mb-8">Register Students (Teacher)</Span>
+        <Span cn="text-3xl font-semibold">Register Students (Teacher)</Span>
 
         {/* STUDENT CREATION */}
-        <Div cn="rounded-2xl shadow-md border p-6 mb-10 bg-white">
-          <Span cn="text-xl font-semibold mb-4">Create Student</Span>
+        <Div cn="rounded-2xl shadow-md border p-6 mt-4 mb-10 bg-white">
+          <Span cn="text-xl font-semibold">Create Student</Span>
 
-          <Div cn="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Div cn="grid grid-cols-1 md:grid-cols-3 mt-4 gap-4">
             <select
               className="p-3 border rounded"
               value={selectedClassForCreate}

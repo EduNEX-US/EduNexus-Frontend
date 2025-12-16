@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-export type Role = "student" | "teacher" | "admin";
+export type Role = "student" | "teacher" | "admin" | "";
 
 interface AuthState {
   id: string | null;
@@ -41,7 +41,6 @@ const authSlice = createSlice({
       state.role = null;
       state.token = null;
       state.isAuthenticated = false;
-
       localStorage.removeItem("edunexus-auth");
     },
   },

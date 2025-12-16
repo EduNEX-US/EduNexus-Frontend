@@ -32,7 +32,8 @@ type StudentAction =
 | { type: "altMob"; payload: number }
 | { type: "guardian"; payload: string }
 | { type: "sClass"; payload: number }
-| { type: "basicFee"; payload: number };
+| { type: "basicFee"; payload: number }
+| { type: "reset"};
 
 type TeacherAction =
 | { type: "tName", payload: string }
@@ -42,7 +43,8 @@ type TeacherAction =
 | { type: "exp", payload: number }
 | { type: "tAddress", payload: string }
 | { type: "tClass", payload: string }
-| { type: "qualification", payload: string };
+| { type: "qualification", payload: string }
+| { type: "reset"};
 
 function reducer(state : StudentForm, action : StudentAction) : StudentForm{
     switch(action.type){
@@ -64,6 +66,8 @@ function reducer(state : StudentForm, action : StudentAction) : StudentForm{
             return {...state, sClass : isNaN(action.payload) ? 0 : action.payload};
         case "basicFee":
             return {...state, basicFee : isNaN(action.payload) ? 0 : action.payload};
+        case "reset":
+            return initialStudents;
         default :
             return state;
     }
@@ -87,6 +91,8 @@ function tReducer(state : TeacherForm, action : TeacherAction) : TeacherForm {
             return {...state, qualification : action.payload};
         case "tClass":
             return {...state, tClass : action.payload};
+        case "reset":
+            return initialTeachers;
         default:
             return state;
     }
@@ -136,16 +142,18 @@ export default function useFuncs(){
 
         if(role === "student"){
             payload = { role : "student", ...studentForm};
+            sDispatch({ type : "reset"});
         }
         else if(role === "teacher"){
             payload = { role : "teacher", ...teacherForm};
+            tDispatch({ type : "reset"});
         }
-        else{
-            payload = { role : "admin", ...teacherForm};
-        }
+        // else{
+        //     payload = { role : "admin", ...teacherForm};
+        // }
 
         try {
-            const res = await fetch("http://localhost:8080/register", {
+            const res = await fetch(`http://localhost:8080/admin/${role}/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

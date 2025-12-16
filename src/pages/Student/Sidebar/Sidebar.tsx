@@ -1,18 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Button, Section, Div, Span} from '../../../Components/Assembler';
 import text from '../../../assets/black-Photoroom-cpy.png';
-import teach from '../../../assets/Teacher in Classroom.gif';
+import stud from '../../../assets/STUDENT.gif';
 import {faChalkboardUser, faAddressCard, faUser, faArrowRightFromBracket, faMagnifyingGlass, faBookOpen} from '@fortawesome/free-solid-svg-icons'
 import type { HandleTab } from './Functionality';
+import useFuncs from './Functionality';
+import { logout } from '../../../features/auth/authSlice';
 export default function Sidebar( props : HandleTab){
     const {handleFunc, activeTab} =  props;
+    const {navigate} = useFuncs();
     return <Section cn='md:w-1/6 h-1/6 flex md:flex-col justify-start items-center md:h-lvh'> {/* Sidebar Section */}
         {/* Div Holding Logo & Traversing Navs */}
         <Div cn='w-full flex md:flex-col justify-start items-center h-full md:h-9/10 text-white bg-purple-300'>
             {/* Title */}
             <Span cn='text-xl md:h-[35%] relative h-full w-1/2 md:w-full flex bg-purple-300 justify-center items-center pt-2 gv text-shadow-xs text-shadow-black'>
-                {/* <img src={edu} className='object-cover h-18 '></img> */}
-                <img src={teach} className='md:object-cover size-18 md:size-3/4 absolute left-0 md:relative'></img>
+                <img src={stud} className='md:object-cover size-18 md:size-3/4 absolute left-0 md:relative'></img>
             </Span>
             {/* Nav Links */}
             <Div cn='md:flex md:flex-col items-center md:h-8/10 hidden w-full'>
@@ -36,17 +38,6 @@ export default function Sidebar( props : HandleTab){
                     </Span>
                     {activeTab === "marks" && <Span cn='text-xl group-hover:hidden text-purple-400'>
                         Marks
-                    </Span>}
-                </Button>
-                <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "register users" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white p-8`} onClick={()=> handleFunc("register users")}>
-                    <Span cn={`text-xl block mr-2 ${activeTab === "register users" ? "text-purple-400" : "text-white"} group-hover:text-purple-400`}>
-                        <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>
-                    </Span>
-                    <Span cn='text-xl hidden group-hover:block group-hover:text-purple-400'>
-                        Register Students
-                    </Span>
-                    {activeTab === "register users" && <Span cn='text-xl group-hover:hidden group-hover:block text-purple-400'>
-                        Register Students
                     </Span>}
                 </Button>
                 <Button cn={`hover:bg-white w-[90%] mb-2 rounded-xl group text-xl h-1/8 ${activeTab === "lost&found" && "bg-white"} flex justify-center items-center text-purple-400 transition transition-all duration-400 ease cursor-pointer hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-white`} onClick={()=> handleFunc("lost&found")}>
@@ -76,7 +67,10 @@ export default function Sidebar( props : HandleTab){
 
         {/* Logout Button */}
         <Div cn='md:h-1/10 h-full hidden md:block bg-purple-300 w-full text-white'>
-            <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={()=>{}}>
+            <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={()=>{
+                logout();
+                navigate("/");
+                }}>
                 <Span cn='text-xl block mr-2'>
                     <FontAwesomeIcon icon={faArrowRightFromBracket} />
                 </Span>
