@@ -27,6 +27,7 @@ export default function Login(){
                     <Div cn='h-1/3 lg:w-3/4 w-[85%] flex flex-col justify-center items-start'>
                         <Input labelCN='text-white font-bold text-lg md:text-xl md:mb-2' labelTxt='ID' inpCN='inset-ring-2 outline-none inset-ring-black rounded-xl text-purple-400 bg-white w-full p-2' type='text' inpTxt='2541x89rft...' forName='id' ref={idRef}></Input>
                     </Div>
+                    
                     <Div cn='h-1/3 lg:w-3/4 w-[85%] flex flex-col justify-center items-start'>
                         <label className='text-white font-bold text-lg md:text-xl md:mb-2'>Password</label>
                         <Div cn='w-full flex justify-center items-center'>

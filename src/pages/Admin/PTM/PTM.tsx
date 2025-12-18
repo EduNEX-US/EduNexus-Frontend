@@ -88,7 +88,7 @@ export default function PTM(){
             <Button
               disabled={!selectedClass || !selectedStudent || !selectedTeacher || !selectedDate || !selectedTime}
               cn={`px-6 py-2 rounded text-white ${(!selectedClass || !selectedStudent || !selectedTeacher || !selectedDate || !selectedTime) ? "bg-gray-400" : " bg-purple-400 hover:bg-purple-700/25 cursor-pointer"}`}
-              onClick={handleSchedule}
+              onClick={handleSchedule} 
             >
               Schedule Meeting
             </Button>

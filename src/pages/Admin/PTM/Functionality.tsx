@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type students = { id : number, name : string};
 type ptms = {id : number, sClass : string, student : string, teacher : string, date : string, time : string};
@@ -23,9 +23,11 @@ export default function useFuncs(){
   const [selectedDate, setSelectedDate] = useState<string>("");
 
   const classes = ["1A", "1B", "2A", "2B", "3A"];
-
+  // useEffect(()=>{
+  //   fetchClassData();
+  // },[]);
   // simulate backend fetch for a class
-  const fetchClassData = ( val : string) => {
+  async function fetchClassData ( val : string) {
     // In reality you'd call an API here. We return dummy data per class.
     const dummyStudents : students[] = [
       { id: 1, name: "Aman Kumar" },
@@ -34,7 +36,14 @@ export default function useFuncs(){
     ];
 
     const dummyTeachers : string[] = ["Mr. Verma", "Ms. Kapoor"];
-
+    try{
+      const res = await fetch("http://localhost:8080/ptm/get");
+      const data = await res.json();
+      setStudents(data.data);
+    }
+    catch{
+      console.log("Error Occurred while fetching");
+    }
     setStudents(dummyStudents);
     setTeachers(dummyTeachers);
 
@@ -46,7 +55,7 @@ export default function useFuncs(){
   };
 
   // Schedule PTM: this schedules (removes student from the scheduling list) but does NOT add to completedPTMs
-  const handleSchedule = () => {
+  async function handleSchedule(){
     if (!selectedClass || !selectedStudent || !selectedTeacher || !selectedTime || !selectedDate) return;
 
     // In production you'd POST to an API which stores scheduled PTMs. Here we just log.
@@ -58,6 +67,30 @@ export default function useFuncs(){
       time: selectedTime,
     });
 
+    const newPTM = {
+      sClass: selectedClass,
+      student: selectedStudent,
+      teacher: selectedTeacher,
+      date: selectedDate,
+      time: selectedTime,
+    };
+
+    try{
+      const res = await fetch("http://localhost:8080/ptm", {
+        headers : {
+          "Content-Type" : "application/json"
+        },
+        method : "POST",
+        body : JSON.stringify(newPTM)
+      });
+
+      if(res.ok){
+
+      }
+    }
+    catch{
+      console.log("Error occurred in PTM Scheduling");
+    }
     // Remove the student so they can't be scheduled again
     setStudents(prev => prev.filter(s => s.name !== selectedStudent));
 

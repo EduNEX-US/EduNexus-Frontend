@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
 
 interface StudentForm{
     sName : string;
@@ -21,6 +21,7 @@ interface TeacherForm{
     address : string;
     tClass : string;
     qualification : string;
+    secretKey : string
 }
 
 type StudentAction =
@@ -44,6 +45,7 @@ type TeacherAction =
 | { type: "tAddress", payload: string }
 | { type: "tClass", payload: string }
 | { type: "qualification", payload: string }
+| { type: "secretKey", payload: string}
 | { type: "reset"};
 
 function reducer(state : StudentForm, action : StudentAction) : StudentForm{
@@ -91,6 +93,8 @@ function tReducer(state : TeacherForm, action : TeacherAction) : TeacherForm {
             return {...state, qualification : action.payload};
         case "tClass":
             return {...state, tClass : action.payload};
+        case "secretKey":
+            return {...state, secretKey : action.payload};
         case "reset":
             return initialTeachers;
         default:
@@ -119,15 +123,49 @@ const initialTeachers: TeacherForm = {
   address: "",
   tClass: "",
   qualification: "",
+  secretKey : ""
 };
 
-export type RoleType = "student" | "teacher" | "admin";
+export type RoleType = "teacher" | "admin";
+export type user = { id : string, name : string};
+export interface users{
+    teacher : user[],
+    admin : user[]
+}
 
+const initialUsers : users = {
+    teacher : [],
+    admin : []
+}
 export default function useFuncs(){
     const [studentForm, sDispatch] = useReducer(reducer, initialStudents);
-    const [role, setRole] = useState<RoleType>("student");
+    const [role, setRole] = useState<RoleType>("teacher");
     const [search, setSearch] = useState<string>("");
     const [teacherForm, tDispatch] = useReducer(tReducer, initialTeachers);
+    const [users, setUsers] = useState<users>(initialUsers);
+
+    useEffect(()=>{
+        fetchTeachers();
+    },[])
+
+    async function fetchTeachers(){
+        try{
+            const res = await fetch("http://localhost:8080/teacherNames");
+            const data = await res.json();
+            const teachs = data.map((d : {id : string, name : string, role : number}) => {
+                    if(d.role === 0)return d.name;
+                })
+                console.log("Teachs", teachs);
+            setUsers(prev => ({
+                teacher: data.filter((d : {role : number}) => d.role === 0).map((d : {id : string, name : string})=> ({ id: d.id, name: d.name })),
+                admin: data.filter((d : {role : number}) => d.role === 1).map((d : {id : string, name : string})=> ({ id: d.id, name: d.name }))
+            }));
+            console.log(data);
+        }
+        catch{
+            console.log("Error occured while fetching teachers");
+        }
+    }
 
     function handleRole(val : RoleType){
         setRole(val);
@@ -140,17 +178,14 @@ export default function useFuncs(){
     async function handleUserCreation(){
         let payload;
 
-        if(role === "student"){
-            payload = { role : "student", ...studentForm};
-            sDispatch({ type : "reset"});
-        }
-        else if(role === "teacher"){
+        if(role === "teacher"){
             payload = { role : "teacher", ...teacherForm};
             tDispatch({ type : "reset"});
         }
-        // else{
-        //     payload = { role : "admin", ...teacherForm};
-        // }
+        else{
+            payload = { role : "admin", ...teacherForm};
+            tDispatch({ type : "reset"});
+        }
 
         try {
             const res = await fetch(`http://localhost:8080/admin/${role}/register`, {
@@ -160,6 +195,9 @@ export default function useFuncs(){
                 },
                 body: JSON.stringify(payload)
             });
+            if(res.ok){
+                fetchTeachers();
+            }
             const data = await res.json();
             console.log("User Created:", data);
             return data;
@@ -168,5 +206,5 @@ export default function useFuncs(){
             return null;
         }
     }
-    return {sDispatch, studentForm, tDispatch, teacherForm, search, handleSearch, role, handleRole, handleUserCreation};
+    return {users, sDispatch, studentForm, tDispatch, teacherForm, search, handleSearch, role, handleRole, handleUserCreation};
 }
