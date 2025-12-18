@@ -24,11 +24,14 @@ export default function Lost_Found(){
             <select
               className="p-3 border rounded"
               value={assignedTo}
-              onChange={(e) => handleAssignedTo(e.target.value)}
+              onChange={(e) => {
+                console.log(e.target.value)
+                handleAssignedTo(e.target.value)
+              }}
             >
               <option value="">Assign Item Under</option>
               {teachers.map(t => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t.id} value={t.id}>{t.name}</option>
               ))}
             </select>
             
@@ -68,7 +71,7 @@ export default function Lost_Found(){
                   <tr key={record.id} className="border-b">
                     <td className="p-3">{record.name}</td>
                     <td className="p-3">{record.description || "—"}</td>
-                    <td className="p-3">{record.assignedTo}</td>
+                    <td className="p-3">{teachers.find(t => t.id === record.assignedTo)?.name}</td>
                     <td className="p-3">{record.date}</td>
                   </tr>
                 ))}

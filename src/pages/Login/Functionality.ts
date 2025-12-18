@@ -27,12 +27,13 @@ export default function useFuncs(){
             body: JSON.stringify({
                 eduId: idRef.current?.value,
                 eduPassword: passRef.current?.value,
-                role: role,
+                role : role
             }),
             });
 
             if (!res.ok) {
-            throw new Error("Login failed");
+            // throw new Error("Login failed");
+            console.log("Error occurred in login");
             }
 
             const data = await res.json();

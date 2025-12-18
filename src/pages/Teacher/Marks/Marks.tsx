@@ -72,7 +72,8 @@ export default function Marks(){
             <Span cn='w-full text-3xl font-semibold flex items-center text-[#243E36]'>Manage Marks</Span>
         </Div>
         <Div cn='flex justify-end w-2/5'>
-            <Button cn='p-3 text-purple-400 text-lg border-2 border-purple-400 hover:bg-purple-400 hover:text-white cursor-pointer text-[#7CA982] rounded-lg' onClick={()=>handleMarkForm(true)}>Upload</Button>
+            <Button cn='p-3 text-purple-400 text-lg border-2 border-purple-400 hover:bg-purple-400 hover:text-white cursor-pointer text-[#7CA982] rounded-lg mr-4' onClick={()=>handleMarkForm(true)}>Upload Manually</Button>
+            <Button cn='p-3 text-purple-400 text-lg border-2 border-purple-400 hover:bg-purple-400 hover:text-white cursor-pointer text-[#7CA982] rounded-lg' onClick={()=>handleMarkForm(true)}>Upload CSV</Button>
         </Div>
     </Div>
     <Div cn='w-[95%] flex justify-between'>

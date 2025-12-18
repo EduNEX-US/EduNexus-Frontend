@@ -10,8 +10,10 @@ export default function useFuncs(){
     role: "Ad",
     address: "",
   });
+  const [update, setUpdate] = useState<boolean>(false);
   const [noticeTitle, setNoticeTitle] = useState<string>("");
   const [noticeBody, setNoticeBody] = useState<string>("");
+  const [updateId, setUpdateId] = useState<string>("");
   const [notices, setNotices] = useState<notice[]>([
     { id: "1", title: "Holiday Notice", body: "School will remain closed on Friday.", date: "2025-01-10" }
   ]);
@@ -57,7 +59,6 @@ export default function useFuncs(){
       body: noticeBody,
       date: new Date().toISOString().split("T")[0]
     };
-    handleNotices(newNotice);
     const res = fetch("http://localhost:8080/notice", {
         headers : {
             "Content-Type" : "application/json"
@@ -74,6 +75,10 @@ export default function useFuncs(){
     }
   };
 
+  function handleUpdateToggle(){
+    setUpdate(!update);
+  }
+
   function handleNotices(val : notice){
     setNotices(prev=> [val, ...prev]);
   }
@@ -85,5 +90,57 @@ export default function useFuncs(){
   function handleNoticeBody(val : string){
     setNoticeBody(val);
   }
-  return {adminInfo, noticeTitle, noticeBody, notices, handleNoticeBody, handleNoticeTitle, handleNotices, handlePostNotice}
+
+  async function handleDeleteNotice(id : string){
+    setNotices(prev => prev.filter(n=> n.id != id));
+    try{
+      const res = await fetch(`http://localhost:8080/notice?id=${id}`, {
+        method : "DELETE"
+      });
+
+      if(res.ok){
+        setNotices(prev => prev.filter(n=> n.id != id));
+      }
+      else{
+        console.log("Failed To Delete");
+      }
+    }
+    catch{
+      console.log("Error Occured In Deleting from DB");
+    }
+  }
+
+  async function handleUpdateNotice() {
+    const newNotice : notice = {
+      id: updateId,
+      title: noticeTitle,
+      body: noticeBody,
+      date: new Date().toISOString().split("T")[0]
+    };
+    try{
+      const res = await fetch(`http://localhost:8080/notice?id=${updateId}`, {
+        method : "PUT"
+      });
+
+      if(res.ok){
+        setNotices(prev => prev.map(n => {
+          if(n.id === updateId){
+            return newNotice;
+          }
+          return n;
+        }));
+      }
+      else{
+        console.log("Failed To Delete");
+      }
+    }
+    catch{
+      console.log("Error Occured In Deleting from DB");
+    }
+  }
+
+  function handleUpdateId(id : string){
+    setUpdateId(id);
+  }
+  return {adminInfo, noticeTitle, noticeBody, notices, update, handleNoticeBody, handleNoticeTitle, handleNotices, handlePostNotice, handleDeleteNotice, handleUpdateNotice, handleUpdateToggle, handleUpdateId}
 }

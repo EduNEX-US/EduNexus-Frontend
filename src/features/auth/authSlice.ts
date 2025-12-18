@@ -31,7 +31,7 @@ const authSlice = createSlice({
       state.role = action.payload.role;
       state.token = action.payload.token;
       state.isAuthenticated = true;
-
+      console.log("I am being called");
       // Persist session
       localStorage.setItem("edunexus-auth", JSON.stringify(state));
     },
