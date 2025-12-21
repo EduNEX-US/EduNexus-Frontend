@@ -54,7 +54,7 @@ export default function Lost_Found(){
         </Div>
 
         {/* Previous Lost Items Table */}
-        <Div cn="shadow-md p-6 bg-orange-50 mx-4">
+        <Div cn="shadow-md p-6 bg-orange-50 mx-4 mb-8">
           <Span cn="text-xl font-semibold mb-4 text-amber-900">Previous Lost & Found Records</Span>
 
           <Div cn="overflow-auto text-amber-600">

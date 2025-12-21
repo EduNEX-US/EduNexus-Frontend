@@ -2,16 +2,17 @@ import {Section, Div, Button, Span, Input} from '../../../Components/Assembler';
 import useFuncs from './Functionality';
 export default function PTM(){
   const {selectedClass, selectedStudent, selectedDate, selectedTime, selectedTeacher, students, teachers, completedPTMs, setStudents, handleFilterClass, handleSelectedClass, handleSelectedDate, handleSelectedTime, handleSelectedTeacher, handleSelectedStudent, addCompletedPTM, handleSchedule, fetchClassData, classes, filterClass} = useFuncs();
-    return <Section cn="flex-1 p-10 overflow-auto bg-white">
-        <h2 className="text-3xl font-semibold mb-8">PTM Management</h2>
+    return <Section cn="h-screen flex flex-col p-4 md:p-0 md:w-[95%] gap-y-8 bg-orange-100">
+        <h2 className="text-3xl font-semibold mb-2 mt-8 h-[7%] text-amber-900">PTM Management</h2>
 
-        {/* PTM Scheduling Block */}
-        <Div cn="rounded-2xl shadow-md border p-6 mb-10 bg-white">
-          <Span cn="text-xl font-semibold mb-4">Schedule PTM</Span>
+        <Div cn='overflow-y-auto flex-1 mt-0 border-3 border-orange-300/50 gap-y-4 p-0'>
+          {/* PTM Scheduling Block */}
+        <Div cn="shadow-md p-6 mb-10 bg-orange-50 mx-4 mt-4">
+          <Span cn="text-xl font-semibold mb-4 text-amber-900">Schedule PTM</Span>
 
           {/* Class Selection (must select first) */}
-          <Div cn="mb-6">
-            <label className="font-semibold block mb-2">Select Class</label>
+          <Div cn="mb-6 text-amber-600">
+            <label className="font-semibold block mb-2 text-amber-900">Select Class</label>
             <select
               value={selectedClass}
               onChange={(e) => {
@@ -28,13 +29,13 @@ export default function PTM(){
           </Div>
 
           {/* PTM Details — visible but disabled until class selected */}
-          <Span cn="text-lg font-semibold mb-4">PTM Details</Span>
+          <Span cn="text-lg font-semibold mb-4 text-amber-900">PTM Details</Span>
 
-          <Div cn="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+          <Div cn="grid grid-cols-1 md:grid-cols-4 text-amber-600 gap-4 items-center">
             {/* Student select (from class) */}
             <select
               disabled={!selectedClass}
-              className="p-3 border rounded"
+              className="p-3 border rounded bg-orange-100"
               value={selectedStudent}
               onChange={(e) => handleSelectedStudent(e.target.value)}
             >
@@ -47,7 +48,7 @@ export default function PTM(){
             {/* Teacher select (teachers for that class) */}
             <select
               disabled={!selectedClass}
-              className="p-3 border rounded"
+              className="p-3 border rounded bg-orange-100"
               value={selectedTeacher}
               onChange={(e) => handleSelectedTeacher(e.target.value)}
             >
@@ -63,7 +64,7 @@ export default function PTM(){
               labelTxt="Date"
               type="date"
               disabled={!selectedClass}
-              inpCN="p-3 border rounded"
+              inpCN="p-3 border rounded bg-orange-100"
               value={selectedDate}
               forName='ptmDate'
               inpTxt='05-11-1969'
@@ -74,7 +75,7 @@ export default function PTM(){
             <Input
               type="time"
               disabled={!selectedClass}
-              inpCN="p-3 border rounded"
+              inpCN="p-3 border rounded bg-orange-100"
               inpTxt='12:00'
               forName='Time'
               labelCN='hidden'
@@ -87,7 +88,7 @@ export default function PTM(){
           <Div cn="flex gap-3 mt-6">
             <Button
               disabled={!selectedClass || !selectedStudent || !selectedTeacher || !selectedDate || !selectedTime}
-              cn={`px-6 py-2 rounded text-white ${(!selectedClass || !selectedStudent || !selectedTeacher || !selectedDate || !selectedTime) ? "bg-gray-400" : " bg-purple-400 hover:bg-purple-700/25 cursor-pointer"}`}
+              cn={`px-6 py-2 rounded text-white ${(!selectedClass || !selectedStudent || !selectedTeacher || !selectedDate || !selectedTime) ? "bg-gray-400" : "bg-teal-400 hover:bg-teal-500 cursor-pointer"}`}
               onClick={handleSchedule} 
             >
               Schedule Meeting
@@ -97,8 +98,8 @@ export default function PTM(){
         </Div>
 
         {/* COMPLETED PTMs TABLE WITH CLASS FILTER */}
-        <Div cn="rounded-2xl shadow-md border p-6 mb-10 bg-white">
-          <h3 className="text-xl font-semibold mb-4">Completed PTMs</h3>
+        <Div cn="shadow-md p-6 mb-8 bg-orange-50 mx-4 text-amber-600">
+          <h3 className="text-xl font-semibold mb-4 text-amber-900">Completed PTMs</h3>
 
           {/* Filter by class */}
           <Div cn="mb-4 flex items-center gap-4">
@@ -134,9 +135,9 @@ export default function PTM(){
                   .filter(ptm => !filterClass || ptm.sClass === filterClass)
                   .map(ptm => (
                     <tr key={ptm.id} className="border-b">
-                      <td className="p-3">{ptm.sClass}</td>
+                      <td className="p-3 text-teal-700">{ptm.sClass}</td>
                       <td className="p-3">{ptm.student}</td>
-                      <td className="p-3">{ptm.teacher}</td>
+                      <td className="p-3 text-teal-700">{ptm.teacher}</td>
                       <td className="p-3">{ptm.date}</td>
                       <td className="p-3">{ptm.time}</td>
                     </tr>
@@ -144,6 +145,7 @@ export default function PTM(){
               </tbody>
             </table>
           </Div>
+        </Div>
         </Div>
       </Section>
 }

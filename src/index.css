@@ -83,9 +83,3 @@ tbody>tr:nth-child(odd) {
   color: oklch(66.6% 0.179 58.318);
 }
 
-.role tbody > tr:nth-child(odd){
-  background-color: white;
-}
-.role tbody > tr:nth-child(even){
-  background-color: oklch(66.6% 0.179 58.318);
-}

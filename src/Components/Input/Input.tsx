@@ -1,9 +1,9 @@
 import type {InputProps} from './Functionality.ts';
 
 export default function Input(props : InputProps){
-    const {labelCN, labelTxt, inpCN, inpTxt, forName, ref, value, type, disabled, onChange} = props;
+    const {labelCN, labelTxt, inpCN, accept, inpTxt, forName, ref, value, type, disabled, onChange} = props;
     return <>
     <label className={labelCN} htmlFor={forName}>{labelTxt}</label>
-    <input type={type} placeholder={inpTxt} value={value} className={inpCN} disabled={disabled} ref={ref} name={forName} onChange={onChange}></input>
+    <input type={type} accept={accept} placeholder={inpTxt} value={value} className={inpCN} disabled={disabled} ref={ref} name={forName} onChange={onChange}></input>
     </>
 }
