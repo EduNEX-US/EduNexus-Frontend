@@ -10,5 +10,6 @@ export interface InputProps{
     inpTxt : string,
     inpCN : string,
     value? : string,
-    disabled? : boolean
+    disabled? : boolean,
+    accept? : string
 }

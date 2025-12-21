@@ -52,9 +52,9 @@ export default function Dashboard(props : HandleTab){
                     </Button>
 
                     {/* Notice Display Section */}
-                    <Div cn="mt-4 md:mt-8">
+                    <Div cn="mt-4 md:mt-8 text-amber-600 mb-8">
                     {/* Recent Notice Title */}
-                    <h3 className="text-lg font-semibold mb-3">Recent Notices</h3>
+                    <h3 className="text-lg font-semibold mb-3 text-amber-900">Recent Notices</h3>
                     {/* Notice List */}
                     <Div cn="flex flex-col gap-3">
                         {notices.map(n => (
@@ -72,7 +72,7 @@ export default function Dashboard(props : HandleTab){
                                     <Button cn="text-red-800" onClick={()=> handleDeleteNotice(n.id)}><FontAwesomeIcon icon={faTrashCan} ></FontAwesomeIcon></Button>
                                 </Div>
                             </Div>
-                            <Div cn="text-xs md:text-sm text-gray-600 mb-2">{n.date}</Div>
+                            <Div cn="text-xs md:text-sm text-teal-600 mb-2">{n.date}</Div>
                             <Div cn='text-xs'>{n.body}</Div>
                         </Div>
                         ))}

@@ -175,14 +175,53 @@ export default function useFuncs(){
         setSearch(val);
     }
 
-    async function handleUserCreation(){
-        let payload;
+    const isEmpty = (value: string | number) => {
+        if (typeof value === "number") return value === 0;
+        return value.trim() === "";
+    };
 
+    const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const isValidPhone = (phone: number) => {
+    return /^\d{10}$/.test(String(phone));
+    };
+
+    const validateForm = () => {
+    if (isEmpty(teacherForm.tName)) return "Name is required";
+    if (isEmpty(teacherForm.email)) return "Email is required";
+    if (!isValidEmail(teacherForm.email)) return "Invalid email format";
+    if (isEmpty(teacherForm.pass)) return "Password is required";
+    if (isEmpty(teacherForm.tMob)) return "Mobile number is required";
+    if (!isValidPhone(teacherForm.tMob)) return "Mobile must be 10 digits";
+    if (isEmpty(teacherForm.tClass)) return "Class is required";
+    if (isEmpty(teacherForm.address)) return "Address is required";
+    if (isEmpty(teacherForm.exp)) return "Experience is required";
+    if (isEmpty(teacherForm.qualification)) return "Qualification is required";
+
+    return null; // ✅ everything valid
+    };
+
+    const formError = validateForm();
+    const isFormInvalid = Boolean(formError);
+
+    async function handleUserCreation(){
+        const error = validateForm();
+        let payload;
+        if(error !== null){
+            alert(error);
+            return;
+        }
         if(role === "teacher"){
             payload = { role : "teacher", ...teacherForm};
             tDispatch({ type : "reset"});
         }
         else{
+            if(teacherForm.secretKey === ""){
+                alert("Empty Secret Key");
+                return;
+            }
             payload = { role : "admin", ...teacherForm};
             tDispatch({ type : "reset"});
         }
@@ -206,5 +245,5 @@ export default function useFuncs(){
             return null;
         }
     }
-    return {users, sDispatch, studentForm, tDispatch, teacherForm, search, handleSearch, role, handleRole, handleUserCreation};
+    return {users, sDispatch, studentForm, tDispatch, teacherForm, search, handleSearch, role, handleRole, handleUserCreation, isFormInvalid};
 }

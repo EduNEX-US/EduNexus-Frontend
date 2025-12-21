@@ -56,6 +56,8 @@ export default function useFuncs(){
     const [markForm, setMarkForm] = useState<boolean>(false);
     const [state, dispatch] = useReducer(reducer, initialState);
     const [primary, setPrimary] = useState<boolean>(false);
+      const [uploadType, setUploadType] = useState<"manual" | "csv">("manual");
+      const [csvFile, setCsvFile] = useState<File | null>(null);
     function handleMarkForm(val : boolean){
         setMarkForm(val);
     };
@@ -112,5 +114,32 @@ const [search , setSearch] = useState<string>("");
   const filteredStudents = dummyData.filter(d => {
     d.name.toLowerCase().includes(search.toLowerCase());
   })
-    return {markForm, handleMarkForm, state, dispatch, primary, setPrimary, handleSearch, dummyData, filteredStudents};
+
+  const uploadCsv = async () => {
+  if (!csvFile) return;
+
+  const formData = new FormData();
+  formData.append("file", csvFile); // 🔥 key MUST be "file"
+
+  try {
+    const response = await fetch("http://localhost:8080/api/marks/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      throw new Error(text);
+    }
+
+    alert(text); // "Upload Complete. Success: X, Failed: Y"
+    handleMarkForm(false);
+    setCsvFile(null);
+  } catch (err: any) {
+    alert("Upload failed: " + err.message);
+  }
+};
+
+    return {markForm, handleMarkForm, state, dispatch, primary, setPrimary, handleSearch, dummyData, filteredStudents, uploadCsv, uploadType, setUploadType, setCsvFile, csvFile};
 }

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router";
 type Role = "student" | "admin" | "teacher" | "";
@@ -11,6 +12,8 @@ export default function useFuncs(){
     const [passType, setPassType] = useState<"text" | "password">("password");
     const [emptyfield, setEmptyField] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
+
+    const dispatchRedux = useDispatch();
 
     function handleLogin(){
         console.log(passRef.current?.value);
@@ -34,15 +37,19 @@ export default function useFuncs(){
             if (!res.ok) {
             // throw new Error("Login failed");
             console.log("Error occurred in login");
+            return;
             }
 
             const data = await res.json();
 
-            loginSuccess({
-            id: idRef.current!.value,
-            role: role,
-            token: data.token,
-            });
+            dispatchRedux(
+  loginSuccess({
+    id: idRef.current!.value,
+    role: role,
+    token: data.token,
+  })
+);
+
 
             if(role === "admin"){
                 navigate("/edu-admin");
