@@ -1,318 +1,321 @@
-import { Div, Span, Button, Input, Section } from '../../../Components/Assembler';
-import useFuncs from './Functionality';
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { Section, Div, Span, Button, Input } from "../../../Components/Assembler";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch, faFileCsv, faXmark } from "@fortawesome/free-solid-svg-icons";
+import useFuncs from "./Functionality";
 
-export default function Marks() {
-  const {
-    markForm,
-    handleMarkForm,
-    state,
-    dispatch,
-    primary,
-    setPrimary,
-    dummyData,
-    handleSearch,
-    filteredStudents,
-    uploadCsv,
-    uploadType,
-    csvFile,
-    setUploadType,
-    setCsvFile
-  } = useFuncs();
+export default function ManageMarks() {
+  const {markForm, handleMarkForm, state, dispatch, primary, setPrimary, handleSearch, dummyData, filteredStudents, uploadCsv, uploadType, setUploadType, setCsvFile, csvFile, showCSV, showManual, handleCSVShow, handleManualShow, handleESC, selectedSubject, handleSelectedSubject} = useFuncs();
 
-  // 🔥 NEW STATE
+  // ESC key close
+  useEffect(() => {
+    window.addEventListener("keydown", handleESC);
+    return () => window.removeEventListener("keydown", handleESC);
+  }, []);
 
   return (
-    <Section cn='bg-white relative md:w-5/6 flex flex-col items-center space-y-6 p-3 text-purple-400 overflow-y-auto'>
+    <Section cn="w-full min-h-screen bg-[#FFF8EE] p-6 overflow-y-auto">
 
-      {/* MODAL */}
-      {markForm && (
-        <Div
-          cn='w-full bg-black/30 h-lvh absolute flex items-center justify-center'
-          onClick={() => {
-            handleMarkForm(false);
-            setCsvFile(null);
-          }}
-        >
-          <Div
-            cn='grid grid-cols-1 border-1 gap-x-8 px-4 border-white md:grid-cols-2 bg-white h-[90%] w-[60%] items-center justify-around'
-            onClick={(e) => e.stopPropagation()}
-          >
+      {/* ===== HEADER ===== */}
+      <Div cn="flex justify-between items-center mb-8">
+        <Span cn="text-2xl font-bold text-[#7A4A00]">
+          Manage Marks
+        </Span>
 
-            {/* ===================== MANUAL UPLOAD ===================== */}
-            {uploadType === "manual" && (
-              <>
-                <Input
-                  labelCN='hidden'
-                  labelTxt='Class'
-                  forName='Class'
-                  type='number'
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Class'
-                  onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (val > 10) val = 10;
-                    if (val < 1) val = 1;
-                    setPrimary(val < 6);
-                  }}
-                />
-
-                <Input
-                  labelCN='hidden'
-                  labelTxt='Id'
-                  forName='Id'
-                  type="text"
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Student ID....'
-                  onChange={(e) =>
-                    dispatch({ type: "id", payload: e.target.value })
-                  }
-                />
-
-                <Input
-                  labelCN='hidden'
-                  type='number'
-                  forName='English'
-                  labelTxt='English'
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='English....'
-                  value={`${state.english}`}
-                  onChange={(e) => {
-                    let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                    dispatch({ type: "eng", payload: val });
-                  }}
-                />
-
-                <Input
-                  labelCN='hidden'
-                  labelTxt='Hindi'
-                  forName='Hindi'
-                  type='number'
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Hindi....'
-                  value={`${state.hindi}`}
-                  onChange={(e) => {
-                    let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                    dispatch({ type: "hin", payload: val });
-                  }}
-                />
-
-                <Input
-                  forName='Math'
-                  labelTxt='Math'
-                  labelCN='hidden'
-                  type='number'
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Math....'
-                  value={`${state.math}`}
-                  onChange={(e) => {
-                    let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                    dispatch({ type: "math", payload: val });
-                  }}
-                />
-
-                <Input
-                  labelCN='hidden'
-                  labelTxt='Science'
-                  forName='Science'
-                  type='number'
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Science....'
-                  value={`${state.science}`}
-                  onChange={(e) => {
-                    let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                    dispatch({ type: "sci", payload: val });
-                  }}
-                />
-
-                <Input
-                  labelCN='hidden'
-                  labelTxt='SS'
-                  forName='SS'
-                  type='number'
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Social Science....'
-                  value={`${state.socialScience}`}
-                  onChange={(e) => {
-                    let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                    dispatch({ type: "ss", payload: val });
-                  }}
-                />
-
-                {!primary && (
-                  <Input
-                    labelCN='hidden'
-                    labelTxt='Computer'
-                    forName='Computer'
-                    type='number'
-                    inpCN='border-2 p-3 text-purple-400'
-                    inpTxt='Computer....'
-                    value={`${state.computer}`}
-                    onChange={(e) => {
-                      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                      dispatch({ type: "comp", payload: val });
-                    }}
-                  />
-                )}
-
-                {primary && (
-                  <Input
-                    labelCN='hidden'
-                    labelTxt='GK'
-                    forName='GK'
-                    type='number'
-                    inpCN='border-2 p-3 text-purple-400'
-                    inpTxt='General Knowledge....'
-                    value={`${state.generalKnowledge}`}
-                    onChange={(e) => {
-                      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                      dispatch({ type: "gk", payload: val });
-                    }}
-                  />
-                )}
-
-                <Input
-                  labelCN='hidden'
-                  labelTxt='Result'
-                  forName='Result'
-                  type="date"
-                  inpCN='border-2 p-3 text-purple-400'
-                  inpTxt='Result Date....'
-                  onChange={(e) =>
-                    dispatch({ type: "rd", payload: new Date(e.target.value) })
-                  }
-                />
-
-                <Button onClick={()=> alert("Hello")} cn='bg-purple-400 text-white p-3 rounded-lg text-lg'>
-                  Upload
-                </Button>
-              </>
-            )}
-
-            {/* ===================== CSV UPLOAD ===================== */}
-            {uploadType === "csv" && (
-              <Div cn="flex flex-col items-center justify-center col-span-full space-y-6">
-
-                <Input
-                  forName='CSV'
-                  labelTxt='CSV'
-                  type="file"
-                  accept=".csv"
-                  labelCN="hidden"
-                  inpCN="border-2 p-3 text-purple-400 w-full"
-                  inpTxt="Upload CSV"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    if (file.type !== "text/csv") {
-                      alert("Only CSV files are allowed");
-                      return;
-                    }
-                    setCsvFile(file);
-                  }}
-                />
-
-                <Button
-                  disabled={!csvFile}
-                  cn={`p-3 rounded-lg text-lg text-white ${
-                    csvFile
-                      ? "bg-purple-400 hover:bg-purple-500"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }`}
-                  onClick={uploadCsv}
-                >
-                  Upload CSV
-                </Button>
-
-              </Div>
-            )}
-
-          </Div>
-        </Div>
-      )}
-
-      {/* HEADER */}
-      <Div cn='flex justify-between w-[95%]'>
-        <Span cn='text-3xl font-semibold text-[#243E36]'>Manage Marks</Span>
-        <Div cn=''>
-          <Button
-            cn='p-3 mr-4 border-2 border-purple-400 rounded-lg'
-            onClick={() => {
-              setUploadType("manual");
-              handleMarkForm(true);
+        <Div cn="flex gap-4">
+          <Button onClick={() => {
+              handleManualShow(true);
+              handleCSVShow(false);
             }}
+            cn="px-4 py-2 rounded-lg border border-amber-300 text-amber-700 hover:bg-amber-100 transition"
           >
             Upload Manually
           </Button>
 
           <Button
-            cn='p-3 border-2 border-purple-400 rounded-lg'
             onClick={() => {
-              setUploadType("csv");
-              handleMarkForm(true);
+              handleCSVShow(true);
+              handleManualShow(false);
             }}
+            cn="px-4 py-2 rounded-lg bg-teal-500 text-white hover:bg-teal-600 transition"
           >
             Upload CSV
           </Button>
         </Div>
       </Div>
 
-      {/* SEARCH + TABLE */}
-      <Div cn='w-[95%] flex justify-between'>
-        <Input
-          labelCN='hidden'
-          labelTxt='Search'
-          forName='Search'
-          type='text'
-          inpCN='w-3/4 border-2 p-2 text-lg'
-          inpTxt='Search for student...'
-          onChange={(e) => handleSearch(e.target.value)}
-        />
+      {/* ===== SEARCH ===== */}
+      <Div cn="flex gap-4 mb-6">
+        <Div cn="flex-1 relative">
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"
+          />
+          <input
+            placeholder="Search for student..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-amber-200/40 shadow-sm focus:ring-2 focus:ring-amber-300 outline-none"
+          />
+        </Div>
 
-        <select
-          value={primary ? "primary" : "secondary"}
-          className='ml-auto border-2 border-purple-400 p-2'
-          onChange={(e) => setPrimary(e.target.value === "primary")}
-        >
-          <option value="primary">Primary</option>
-          <option value="secondary">Secondary</option>
+        <select className="px-4 py-3 rounded-xl bg-white border border-amber-200/40 shadow-sm text-amber-700">
+          <option>Secondary</option>
         </select>
       </Div>
 
-      <Div cn='w-[95%]'>
-        <table className='border-2 w-full'>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Class</th>
-              <th>Name</th>
-              <th>English</th>
-              <th>Hindi</th>
-              <th>Math</th>
-              <th>Science</th>
-              <th>S. Science</th>
-              {!primary && <th>Computer</th>}
-              {primary && <th>G.K</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStudents.map(d => (
-              <tr key={d.studentId}>
-                <td>{d.studentId}</td>
-                <td>{d.class}</td>
-                <td>{d.name}</td>
-                <td>{d.marks.English}</td>
-                <td>{d.marks.Hindi}</td>
-                <td>{d.marks.Math}</td>
-                <td>{d.marks.Science}</td>
-                <td>{d.marks['Social Science']}</td>
-                {!primary && <td>{d.marks.Computer}</td>}
-                {primary && <td>{d.marks['General Knowledge']}</td>}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* ===== TABLE ===== */}
+      <Div cn="bg-white/70 rounded-2xl border border-amber-200/40 shadow-sm overflow-hidden">
+        <Div cn="grid grid-cols-9 px-4 py-3 bg-amber-100/70 text-sm font-semibold text-[#7A4A00]">
+          <Span cn="">Id</Span>
+          <Span cn="">Class</Span>
+          <Span cn="">Name</Span>
+          <Span cn="">English</Span>
+          <Span cn="">Hindi</Span>
+          <Span cn="">Math</Span>
+          <Span cn="">Science</Span>
+          <Span cn="">S. Science</Span>
+          <Span cn="">Computer</Span>
+        </Div>
+
+        <Div cn="p-10 text-center text-amber-600 opacity-70">
+          No records found
+        </Div>
       </Div>
+
+      {/* ================= MANUAL MODAL ================= */}
+      {showManual && (
+        <Div cn="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fadeIn"
+             onClick={() => handleManualShow(false)}>
+
+          <Div
+            onClick={(e) => e.stopPropagation()}
+            cn="bg-white rounded-2xl p-8 w-[620px] shadow-xl
+                       animate-scaleIn"
+          >
+            <Div cn="flex justify-between items-center mb-6">
+              <Span cn="text-xl font-bold text-[#7A4A00]">
+                Upload Marks Manually
+              </Span>
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="cursor-pointer text-amber-700"
+                onClick={() => handleManualShow(false)}
+              />
+            </Div>
+
+            <Div cn="grid grid-cols-2 gap-4">
+
+  {/* Fixed Fields */}
+  <Input
+    labelCN="hidden"
+    labelTxt="Class"
+    forName="Class"
+    type="number"
+    inpTxt="Class"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    onChange={(e) => {
+      let val = parseInt(e.target.value);
+      if (val > 10) val = 10;
+      if (val < 1) val = 1;
+      setPrimary(val < 6);
+    }}
+  />
+
+  <Input
+    labelCN="hidden"
+    labelTxt="ID"
+    forName="Id"
+    type="number"
+    inpTxt="Student ID"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    onChange={(e) =>
+      dispatch({ type: "id", payload: e.target.value })
+    }
+  />
+
+  <Input
+    labelCN="hidden"
+    labelTxt="English"
+    forName="English"
+    type="number"
+    inpTxt="English"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    value={`${state.english}`}
+    onChange={(e) => {
+      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
+      dispatch({ type: "eng", payload: val });
+    }}
+  />
+
+  <Input
+    labelCN="hidden"
+    labelTxt="Hindi"
+    forName="Hindi"
+    type="number"
+    inpTxt="Hindi"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    value={`${state.hindi}`}
+    onChange={(e) => {
+      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
+      dispatch({ type: "hin", payload: val });
+    }}
+  />
+
+  <Input
+    labelCN="hidden"
+    labelTxt="Math"
+    forName="Math"
+    type="number"
+    inpTxt="Math"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    value={`${state.math}`}
+    onChange={(e) => {
+      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
+      dispatch({ type: "math", payload: val });
+    }}
+  />
+
+  <Input
+    labelCN="hidden"
+    labelTxt="Science"
+    forName="Science"
+    type="number"
+    inpTxt="Science"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    value={`${state.science}`}
+    onChange={(e) => {
+      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
+      dispatch({ type: "sci", payload: val });
+    }}
+  />
+
+  <Input
+    labelCN="hidden"
+    labelTxt="Social Science"
+    forName="Social Science"
+    type="number"
+    inpTxt="Social Science"
+    inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    value={`${state.socialScience}`}
+    onChange={(e) => {
+      let val = Math.min(100, Math.max(0, parseInt(e.target.value)));
+      dispatch({ type: "ss", payload: val });
+    }}
+  />
+
+  {/* 🔁 Interchangeable Subject */}
+  <Div cn="flex gap-2">
+    <select
+      value={selectedSubject}
+  onChange={(e) => handleSelectedSubject(e.target.value as "computer" | "gk")}
+      className="w-1/2 px-3 py-3 rounded-lg border border-amber-200/40 bg-white text-amber-700 focus:ring-2 focus:ring-amber-300 outline-none"
+    >
+      <option value={`${state.computer}`}>Computer</option>
+      <option value={`${state.generalKnowledge}`}>GK</option>
+    </select>
+
+    <Input
+    labelCN="hidden"
+    labelTxt="Marks"
+    forName="Marks"
+      inpTxt="Marks"
+      value={
+    selectedSubject === "computer"
+      ? `${state.computer}`
+      : `${state.generalKnowledge}`
+  }
+  type="number"
+  onChange={(e) => {
+    const val = Math.min(100, Math.max(0, Number(e.target.value)));
+
+    dispatch({
+        type: selectedSubject === "computer" ? "comp" : "gk",
+        payload: val,
+      });
+    }}
+      inpCN="w-1/2 px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
+    />
+  </Div>
+
+  {/* Date */}
+  <input
+    type="date"
+    className="px-4 py-3 rounded-lg border border-amber-200/40"
+  />
+
+  {/* Upload Button */}
+  <button className="bg-teal-500 text-white rounded-lg py-3 hover:bg-teal-600 transition">
+    Upload
+  </button>
+
+</Div>
+
+          </Div>
+        </Div>
+      )}
+
+      {/* ================= CSV MODAL ================= */}
+      {showCSV && (
+        <Div cn="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fadeIn"
+             onClick={() => handleCSVShow(false)}>
+
+          <Div
+            onClick={(e) => e.stopPropagation()}
+            cn="bg-white rounded-2xl p-8 w-[480px] shadow-xl text-center
+                       animate-scaleIn"
+          >
+            <Div cn="flex justify-between items-center mb-6">
+              <Span cn="text-xl font-bold text-[#7A4A00]">
+                Upload CSV
+              </Span>
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="cursor-pointer text-amber-700"
+                onClick={() => handleCSVShow(false)}
+              />
+            </Div>
+
+            <label
+  htmlFor="csv-upload"
+  className="border-2 border-dashed border-amber-300 rounded-xl p-6 mb-6
+             text-amber-700 flex flex-col items-center justify-center
+             cursor-pointer hover:bg-amber-50 transition"
+>
+  <FontAwesomeIcon icon={faFileCsv} className="text-3xl mb-3" />
+  <Span cn="block font-medium">Choose CSV file</Span>
+
+  <input
+    id="csv-upload"
+    type="file"
+    accept=".csv"
+    className="hidden"
+  />
+</label>
+
+
+            <button className="bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition">
+              Upload CSV
+            </button>
+          </Div>
+        </Div>
+      )}
+
+      {/* ===== ANIMATIONS ===== */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+        .animate-scaleIn {
+          animation: scaleIn 0.25s ease-out;
+        }
+      `}</style>
 
     </Section>
   );

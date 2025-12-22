@@ -56,8 +56,11 @@ export default function useFuncs(){
     const [markForm, setMarkForm] = useState<boolean>(false);
     const [state, dispatch] = useReducer(reducer, initialState);
     const [primary, setPrimary] = useState<boolean>(false);
-      const [uploadType, setUploadType] = useState<"manual" | "csv">("manual");
-      const [csvFile, setCsvFile] = useState<File | null>(null);
+    const [showManual, setShowManual] = useState<boolean>(false);
+    const [selectedSubject, setSelectedSubject] = useState<"gk" | "computer">("computer");
+    const [showCSV, setShowCSV] = useState<boolean>(false);
+    const [uploadType, setUploadType] = useState<"manual" | "csv">("manual");
+    const [csvFile, setCsvFile] = useState<File | null>(null);
     function handleMarkForm(val : boolean){
         setMarkForm(val);
     };
@@ -115,31 +118,51 @@ const [search , setSearch] = useState<string>("");
     d.name.toLowerCase().includes(search.toLowerCase());
   })
 
-  const uploadCsv = async () => {
-  if (!csvFile) return;
+  async function uploadCsv() {
+    if (!csvFile) return;
 
-  const formData = new FormData();
-  formData.append("file", csvFile); // 🔥 key MUST be "file"
+    const formData = new FormData();
+    formData.append("file", csvFile);
 
-  try {
-    const response = await fetch("http://localhost:8080/api/marks/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("http://localhost:8080/api/marks/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const text = await response.text();
+      const text = await response.text();
 
-    if (!response.ok) {
-      throw new Error(text);
+      if (!response.ok) {
+        throw new Error(text);
+      }
+
+      alert(text); // "Upload Complete. Success: X, Failed: Y"
+      handleMarkForm(false);
+      setCsvFile(null);
+    } catch (err: any) {
+      alert("Upload failed: " + err.message);
     }
+  };
 
-    alert(text); // "Upload Complete. Success: X, Failed: Y"
-    handleMarkForm(false);
-    setCsvFile(null);
-  } catch (err: any) {
-    alert("Upload failed: " + err.message);
+  function handleManualShow(val : boolean){
+    setShowManual(val);
   }
-};
 
-    return {markForm, handleMarkForm, state, dispatch, primary, setPrimary, handleSearch, dummyData, filteredStudents, uploadCsv, uploadType, setUploadType, setCsvFile, csvFile};
+  function handleCSVShow(val : boolean){
+    setShowCSV(val);
+  }
+
+  function handleESC (e: KeyboardEvent){
+      if (e.key === "Escape") {
+        handleManualShow(false);
+        handleCSVShow(false);
+      }
+    };
+
+    function handleSelectedSubject(val : "gk" | "computer"){
+      setSelectedSubject(val);
+    }
+    return {markForm, handleMarkForm, state, dispatch, primary, setPrimary, handleSearch, dummyData, filteredStudents, uploadCsv, uploadType, setUploadType, setCsvFile, csvFile, showCSV, showManual, handleCSVShow, handleManualShow, handleESC, selectedSubject
+      , handleSelectedSubject
+    };
 }
