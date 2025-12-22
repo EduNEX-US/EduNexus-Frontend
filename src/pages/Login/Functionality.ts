@@ -28,8 +28,8 @@ export default function useFuncs(){
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                eduId: idRef.current?.value,
-                eduPassword: passRef.current?.value,
+                edu_id: idRef.current?.value,
+                edu_password: passRef.current?.value,
                 role : role
             }),
             });
