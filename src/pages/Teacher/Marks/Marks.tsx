@@ -264,7 +264,7 @@ export default function ManageMarks() {
                        animate-scaleIn"
           >
             <Div cn="flex justify-between items-center mb-6">
-              <Span cn="text-xl font-bold text-[#7A4A00]">
+              <Span cn="text-2xl font-bold text-[#7A4A00]">
                 Upload CSV
               </Span>
               <FontAwesomeIcon
@@ -274,27 +274,58 @@ export default function ManageMarks() {
               />
             </Div>
 
-            <label
-  htmlFor="csv-upload"
-  className="border-2 border-dashed border-amber-300 rounded-xl p-6 mb-6
-             text-amber-700 flex flex-col items-center justify-center
-             cursor-pointer hover:bg-amber-50 transition"
->
-  <FontAwesomeIcon icon={faFileCsv} className="text-3xl mb-3" />
-  <Span cn="block font-medium">Choose CSV file</Span>
+             <label
+    htmlFor="csv-upload"
+    className="
+      w-full border-2 border-dashed border-amber-300 rounded-xl p-6
+      text-amber-700 flex flex-col items-center justify-center
+      cursor-pointer hover:bg-amber-50 transition
+    "
+  >
+    <FontAwesomeIcon icon={faFileCsv} className="text-3xl mb-3" />
+    
+    <Span cn="font-medium">
+      {csvFile ? csvFile.name : "Choose CSV file"}
+    </Span>
 
-  <input
-    id="csv-upload"
-    type="file"
-    accept=".csv"
-    className="hidden"
-  />
-</label>
+    <input
+      id="csv-upload"
+      type="file"
+      accept=".csv"
+      className="hidden"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
+        if (
+          file.type !== "text/csv" &&
+          !file.name.toLowerCase().endsWith(".csv")
+        ) {
+          alert("Only CSV files are allowed");
+          return;
+        }
 
-            <button className="bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition">
-              Upload CSV
-            </button>
+        setCsvFile(file);
+      }}
+    />
+  </label>
+
+  {/* UPLOAD BUTTON */}
+  <Button
+    disabled={!csvFile}
+    cn={`
+      px-6 py-3 mt-8 rounded-lg text-lg text-white transition
+      ${
+        csvFile
+          ? "bg-teal-500 hover:bg-teal-600"
+          : "bg-gray-400 cursor-not-allowed"
+      }
+    `}
+    onClick={uploadCsv}
+  >
+    Upload CSV
+  </Button>
+
           </Div>
         </Div>
       )}
