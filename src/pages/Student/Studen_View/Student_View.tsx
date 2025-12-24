@@ -6,9 +6,9 @@ import Ptm from '../PTM/Ptm';
 import Lost_Found from '../Lost&Found/Lost_Found';
 import useStudentView from './Functionality';
 export default function Student_View(){
-    const {activeTab, handleActiveTab} = useStudentView();
+    const {activeTab, handleActiveTab, handleBarsVisibility, barsVisibility} = useStudentView();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
-        <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
+        <Sidebar handleFunc={handleActiveTab} activeTab={activeTab} handleBarsVisibility={handleBarsVisibility} barsVisibility={barsVisibility} />
         { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
         { activeTab === "marks" && <Marks /> }
         { activeTab === "lost&found" && <Lost_Found /> }
