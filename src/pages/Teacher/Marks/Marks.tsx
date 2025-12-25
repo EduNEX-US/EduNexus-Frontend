@@ -27,7 +27,7 @@ export default function ManageMarks() {
               handleManualShow(true);
               handleCSVShow(false);
             }}
-            cn="px-4 py-2 rounded-lg border border-amber-300 text-amber-700 hover:bg-amber-100 transition"
+            cn="px-4 py-2 rounded-lg border border-amber-300 text-amber-700 hover:bg-amber-100 transition cursor-pointer"
           >
             Upload Manually
           </Button>
@@ -37,7 +37,7 @@ export default function ManageMarks() {
               handleCSVShow(true);
               handleManualShow(false);
             }}
-            cn="px-4 py-2 rounded-lg bg-teal-500 text-white hover:bg-teal-600 transition"
+            cn="px-4 py-2 rounded-lg bg-teal-500 text-white hover:bg-teal-600 transition cursor-pointer"
           >
             Upload CSV
           </Button>
@@ -51,9 +51,14 @@ export default function ManageMarks() {
             icon={faSearch}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"
           />
-          <input
-            placeholder="Search for student..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-amber-200/40 shadow-sm focus:ring-2 focus:ring-amber-300 outline-none"
+          <Input
+            labelCN="hidden"
+            labelTxt="Search"
+            forName="search"
+            onChange={()=>{}}
+            type="text"
+            inpTxt="Search for student..."
+            inpCN="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-amber-200/40 shadow-sm focus:ring-2 focus:ring-amber-300 outline-none"
           />
         </Div>
 
@@ -317,7 +322,7 @@ export default function ManageMarks() {
       px-6 py-3 mt-8 rounded-lg text-lg text-white transition
       ${
         csvFile
-          ? "bg-teal-500 hover:bg-teal-600"
+          ? "bg-teal-500 hover:bg-teal-600 cursor-pointer"
           : "bg-gray-400 cursor-not-allowed"
       }
     `}
@@ -329,25 +334,6 @@ export default function ManageMarks() {
           </Div>
         </Div>
       )}
-
-      {/* ===== ANIMATIONS ===== */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-        .animate-scaleIn {
-          animation: scaleIn 0.25s ease-out;
-        }
-      `}</style>
-
     </Section>
   );
 }

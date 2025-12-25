@@ -1,41 +1,140 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Section, Div, Button, Span } from "../../../Components/Assembler";
 import { ptmData } from "./Functionality";
-import { faArrowUpRightFromSquare, faLocation } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowUpRightFromSquare,
+  faLocationDot,
+} from "@fortawesome/free-solid-svg-icons";
 import { faBell, faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
-export default function Ptm(){
-    return <Section cn='md:overflow-y-none overflow-y-auto md:w-5/6 w-full md:h-lvh h-5/6 flex flex-col justify-around items-center gap-4'> {/* PTM Section */}
-      {/* Upcoming PTM Notifier */}
-      {ptmData.upcoming && (
-        <Div cn="bg-purple-400 rounded-xl p-6 text-white w-[95%] md:w-3/4 ml-3 mt-4">
-          <Div cn="flex items-center gap-2 mb-3"><FontAwesomeIcon className="text-yellow-300" icon={faBell}></FontAwesomeIcon><Span cn="text-sm font-medium text-yellow-300">Upcoming Meeting</Span></Div>
-          <h2 className="text-sm md:text-xl font-bold mb-2">Parent-Teacher Meeting</h2>
-          <p className="text-indigo-100 mb-4">{ptmData.upcoming.agenda}</p>
-          <Div cn="flex flex-wrap gap-4 text-sm mb-4">
-            <Span cn="flex items-center gap-1"><FontAwesomeIcon icon={faCalendar}></FontAwesomeIcon> {ptmData.upcoming.date}</Span>
-            <Span cn="flex items-center gap-1"><FontAwesomeIcon icon={faClock}></FontAwesomeIcon> {ptmData.upcoming.time}</Span>
-            <Span cn="flex items-center gap-1"><FontAwesomeIcon icon={faLocation}></FontAwesomeIcon> {ptmData.upcoming.venue}</Span>
-          </Div>
-          <a href={ptmData.upcoming.meetLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-white text-purple-400 font-medium rounded-lg hover:bg-indigo-50 transition-colors">
-            <FontAwesomeIcon icon={faArrowUpRightFromSquare}></FontAwesomeIcon> Join Online Meeting
-          </a>
-        </Div>
-      )}
 
-      {/* Previously Held Meetings */}
-      <Div cn="bg-white rounded-xl p-6 border-1 border-black w-[95%]  ml-3 md:w-3/4">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6">Past Meetings</h2>
-        <Div cn="space-y-4">
-          {ptmData.past.map(meeting => (
-            <Div key={meeting.id} cn="border-1 border-black rounded-xl text-black p-5">
-              <Div cn="flex items-start justify-between mb-3">
-                <Div cn=""><h3 className="font-semibold">{meeting.teacher}</h3><p className="text-sm text-gray-500">{meeting.subject}</p></Div>
-                <Div cn="text-right text-sm text-gray-500"><p>{meeting.date}</p><p>{meeting.time}</p></Div>
-              </Div>
-              <Div cn="bg-purple-400 rounded-lg p-3"><p className="text-sm text-white"><Span cn="font-medium text-black">Summary: </Span>{meeting.summary}</p></Div>
+export default function Ptm() {
+  return (
+    <Section
+      cn="
+        w-full h-screen bg-orange-50
+        flex flex-col overflow-y-auto
+        p-6
+      "
+    >
+      {/* PAGE TITLE */}
+      <Span cn="text-xl lg:text-2xl font-semibold text-amber-900 mb-6">
+        Parent-Teacher Meetings
+      </Span>
+
+      {/* CONTENT WRAPPER */}
+      <Div cn="flex flex-col gap-8 max-w-5xl w-full mx-auto">
+
+        {/* ================= UPCOMING PTM ================= */}
+        {ptmData.upcoming && (
+          <Div
+            cn="
+              relative overflow-hidden
+              bg-teal-400 text-white
+              rounded-2xl p-6 shadow-sm
+            "
+          >
+            {/* Accent strip */}
+            <Div cn="absolute inset-x-0 top-0 h-1 bg-yellow-300">{""}</Div>
+
+            <Div cn="flex items-center gap-2 mb-3">
+              <FontAwesomeIcon
+                icon={faBell}
+                className="text-yellow-300"
+              />
+              <Span cn="text-sm font-medium text-yellow-100">
+                Upcoming Meeting
+              </Span>
             </Div>
-          ))}
+
+            <h2 className="text-lg md:text-xl font-bold mb-2">
+              Parent-Teacher Meeting
+            </h2>
+
+            <p className="text-white/90 mb-4 max-w-2xl">
+              {ptmData.upcoming.agenda}
+            </p>
+
+            <Div cn="flex flex-wrap gap-4 text-sm mb-5">
+              <Span cn="flex items-center gap-1">
+                <FontAwesomeIcon icon={faCalendar} />
+                {ptmData.upcoming.date}
+              </Span>
+              <Span cn="flex items-center gap-1">
+                <FontAwesomeIcon icon={faClock} />
+                {ptmData.upcoming.time}
+              </Span>
+              <Span cn="flex items-center gap-1">
+                <FontAwesomeIcon icon={faLocationDot} />
+                {ptmData.upcoming.venue}
+              </Span>
+            </Div>
+
+            <a
+              href={ptmData.upcoming.meetLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                inline-flex items-center gap-2
+                px-5 py-2 rounded-lg
+                bg-white text-teal-500
+                font-medium
+                hover:bg-amber-50 transition
+              "
+            >
+              <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              Join Online Meeting
+            </a>
+          </Div>
+        )}
+
+        {/* ================= PAST MEETINGS ================= */}
+        <Div
+          cn="
+            bg-white/70 rounded-2xl
+            border border-amber-200/40
+            shadow-sm p-6
+          "
+        >
+          <Span cn="text-lg font-semibold text-amber-900 mb-5 block">
+            Past Meetings
+          </Span>
+
+          <Div cn="space-y-4">
+            {ptmData.past.map((meeting) => (
+              <Div
+                key={meeting.id}
+                cn="
+                  rounded-xl p-5
+                  border-2 border-amber-200/40
+                  hover:bg-amber-100/40 transition
+                "
+              >
+                <Div cn="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-3">
+                  <Div cn="">
+                    <h3 className="font-semibold text-amber-900">
+                      {meeting.teacher}
+                    </h3>
+                    <p className="text-sm text-amber-700">
+                      {meeting.subject}
+                    </p>
+                  </Div>
+
+                  <Div cn="text-sm text-amber-600 md:text-right">
+                    <p>{meeting.date}</p>
+                    <p>{meeting.time}</p>
+                  </Div>
+                </Div>
+
+                <Div cn="bg-amber-100/60 rounded-lg p-3 text-sm text-amber-900">
+                  <Span cn="font-medium">Summary: </Span>
+                  {meeting.summary}
+                </Div>
+              </Div>
+            ))}
+          </Div>
         </Div>
+
       </Div>
     </Section>
+  );
 }
