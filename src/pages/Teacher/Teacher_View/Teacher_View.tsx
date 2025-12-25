@@ -6,13 +6,14 @@ import Marks from "../Marks/Marks";
 import PTM from "../PTM/PTM";
 import Lost_Found from "../Lost&Found/Lost_Found";
 import Register_Students from "../Register_Students/Register_Students";
-
+import Attendance from "../Attendance/Attendance";
 export default function Teacher_View(){
     const {activeTab, handleActiveTab} = useTeacherView();
     return <Section cn='w-full h-screen flex md:flex-row flex-col overflow-x-hidden'>
             <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
             { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
             { activeTab === "marks" && <Marks /> }
+            { activeTab === "attendance" && <Attendance /> }
             { activeTab === "register users" && <Register_Students />}
             { activeTab === "lost&found" && <Lost_Found /> }
             { activeTab === "ptm" && <PTM /> }
