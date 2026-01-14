@@ -5,9 +5,10 @@ import {Button, Section, Div, Span} from '../../../Components/Assembler';
 import text from '../../../assets/black-Photoroom-cpy.png';
 import admin from "../../../assets/Office Worker.gif";
 import {faChalkboardUser, faAddressCard, faUser, faArrowRightFromBracket, faMagnifyingGlass, faBars, faCircleXmark} from '@fortawesome/free-solid-svg-icons'
-import type { HandleTab } from './Functionality';
+import { useFuncs, type HandleTab } from './Functionality';
 export default function Sidebar( props : HandleTab){
     const {handleFunc, activeTab, barsVisibility, handleBarsVisibility} =  props;
+    const { handleLogout } = useFuncs();
     return <Section cn='md:w-[5%] h-1/7 bg-orange-100 flex md:flex-col justify-start items-center md:h-lvh '> {/* Sidebar Section */}
         {/* Div Holding Logo & Traversing Navs */}
         <Div cn='w-full flex md:flex-col justify-start items-center h-full md:h-9/10 text-amber-600'>
@@ -56,7 +57,7 @@ export default function Sidebar( props : HandleTab){
 
         {/* Logout Button */}
         <Div cn={`md:h-1/10 h-full hidden md:block  w-full ${barsVisibility ? "hidden" : ""} text-amber-600`}>
-            <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={()=>{}}>
+            <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={handleLogout}>
                 <Span cn='text-sm lg:text-xl block mr-2'>
                     <FontAwesomeIcon icon={faArrowRightFromBracket} />
                 </Span>

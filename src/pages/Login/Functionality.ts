@@ -1,86 +1,72 @@
 import { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../features/auth/authSlice";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { hydrateAuth } from "../../features/auth/authThunk";
+import { setToken } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router";
+
 type Role = "student" | "admin" | "teacher" | "";
-export default function useFuncs(){
-    const idRef = useRef<HTMLInputElement>(null);
-    const navigate = useNavigate();
-    const passRef = useRef<HTMLInputElement>(null);
-    const timerRef = useRef(null); // Ref for 
-    const [role, setRole] =  useState<Role | "">("");
-    const [passType, setPassType] = useState<"text" | "password">("password");
-    const [emptyfield, setEmptyField] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
 
-    const dispatchRedux = useDispatch();
+export default function useFuncs() {
+  const idRef = useRef<HTMLInputElement>(null);
+  const passRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
-    function handleLogin(){
-        console.log(passRef.current?.value);
-        loginUser();
+  const [role, setRole] = useState<Role>("");
+  const [error, setError] = useState("");
+
+  const dispatch = useAppDispatch();
+
+  async function loginUser() {
+    try {
+      const res = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          edu_id: idRef.current?.value,
+          edu_password: passRef.current?.value,
+          role,
+        }),
+      });
+
+      if (!res.ok) {
+        setError("Invalid credentials");
+        return;
+      }
+
+      const data = await res.json(); // { token }
+
+      // 1) store token
+      dispatch(setToken({ token: data.token }));
+
+      // 2) hydrate from backend (/me + profile)
+      const result = await dispatch(hydrateAuth()).unwrap();
+
+      // 3) must-change password force screen
+      if (result.mustChangePassword) {
+        navigate("/change-password");
+        return;
+      }
+      else{
+        console.log(result);
+        console.log("It ccame false");
+      }
+
+      // 4) route by role
+      if (result.role === "admin") navigate("/edu-admin");
+      else if (result.role === "teacher") navigate("/edu-teach");
+      else navigate("/edu-stud");
+    } catch {
+      setError("Server error");
     }
+  }
 
-    async function loginUser() {
-        try {
-            const res = await fetch("http://localhost:8080/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                edu_id: idRef.current?.value,
-                edu_password: passRef.current?.value,
-                role : role
-            }),
-            });
+  function handleLogin() {
+    loginUser();
+  }
 
-            if (!res.ok) {
-            // throw new Error("Login failed");
-            console.log("Error occurred in login");
-            return;
-            }
+  function handleRole(e: React.ChangeEvent<HTMLInputElement>) {
+    setRole(e.target.value as Role);
+  }
 
-            const data = await res.json();
-
-            dispatchRedux(
-  loginSuccess({
-    id: idRef.current!.value,
-    role: role,
-    token: data.token,
-  })
-);
-
-
-            if(role === "admin"){
-                navigate("/edu-admin");
-            }
-            else if(role === "teacher"){
-                navigate("/edu-teach");
-            }
-            else if(role === "student"){
-                navigate("/edu-stud");
-            }
-        } catch (error) {
-            console.error("Error while logging in:", error);
-        }
-        }
-
-    function handleRole( e : React.ChangeEvent<HTMLInputElement>){
-        setRole(e.target.value as Role);
-    }
-
-    function handlePassType(){
-        setPassType(prev => prev==="password" ? "text" : "password");
-    }
-
-    function handleEmptyField(val : boolean){
-        setEmptyField(val);
-    }
-
-    function handleError(val : string){
-        setError(val);
-    }
-
-    
-    return {idRef, timerRef, passRef, role, handleRole, setRole, passType, handlePassType, emptyfield, handleEmptyField, handleLogin};
+  return { idRef, passRef, role, handleRole, handleLogin, error };
 }
