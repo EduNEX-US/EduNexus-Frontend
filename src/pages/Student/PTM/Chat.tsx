@@ -15,7 +15,7 @@ const Chat = ({ roomId }: { roomId: string }) => {
     socket.emit("chat-message", { roomId, message: text });
     setMessages(prev => [...prev, text]);
     setText("");
-  };
+  }; 
 
   return (
     <div>

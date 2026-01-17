@@ -19,7 +19,10 @@ import useFuncs from "./Functionality";
 import Lottie from "lottie-react";
 
 export default function Dashboard(props: HandleTab) {
-  const { teacherProfile, ptmMeetings } = useFuncs();
+  const { teacherProfile,
+    profileLoading,
+    profileError,
+    fetchTeacherProfileById} = useFuncs();
 
   return (
     <Section cn="bg-orange-50 md:w-[95%] flex flex-col items-center space-y-10 p-6 overflow-y-auto">
@@ -37,7 +40,7 @@ export default function Dashboard(props: HandleTab) {
         ">
           <Div cn="flex flex-col gap-1">
             <Span cn="text-2xl font-bold text-amber-900">
-              Welcome Back Mr. Aman Kaushik
+              Welcome Back {teacherProfile?.name}
             </Span>
             <Div cn="flex items-center text-sm text-amber-700">
               <FontAwesomeIcon icon={faGraduationCap} className="mr-2 opacity-70" />
@@ -45,7 +48,7 @@ export default function Dashboard(props: HandleTab) {
             </Div>
           </Div>
           <Span cn="bg-white rounded-full size-16 flex items-center justify-center text-3xl text-amber-900 shadow">
-            AK
+            <img src={`http://localhost:8080${teacherProfile?.imageUrl}`}></img>
           </Span>
         </Div>
 
@@ -81,10 +84,10 @@ export default function Dashboard(props: HandleTab) {
       <Div cn="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-[95%]">
 
         {[
-          { label: "Total Students", value: teacherProfile.totalStudents, icon: faUsers },
-          { label: "Classes", value: teacherProfile.classes.length, icon: faBookOpen },
-          { label: "Upcoming PTMs", value: ptmMeetings.filter(m => m.status === "scheduled").length, icon: faCalendar },
-          { label: "Experience", value: teacherProfile.experience, icon: faAward },
+          { label: "Total Students", value: teacherProfile?.students, icon: faUsers },
+          { label: "Classes", value: teacherProfile?.tClass.length, icon: faBookOpen },
+          // { label: "Upcoming PTMs", value: teacherProfile?.ptmMeetings.filter(m => m.status === "scheduled").length, icon: faCalendar },
+          { label: "Experience", value: teacherProfile?.exp, icon: faAward },
         ].map((item, idx) => (
           <Div
             key={idx}
@@ -108,7 +111,7 @@ export default function Dashboard(props: HandleTab) {
       <Div cn="w-[95%] space-y-4">
         <Span cn="text-xl font-bold text-amber-900">Today's Schedule</Span>
 
-        {teacherProfile.classes.map((cls, idx) => (
+        {teacherProfile?.tClass.split(",").map((cls, idx) => (
           <Div
             key={idx}
             cn="

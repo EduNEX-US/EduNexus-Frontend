@@ -2,18 +2,6 @@ import { useEffect, useReducer, useState } from "react"
 import { useAppSelector } from "../../../hooks/useAppSelector";
 import Papa from "papaparse";
 
-// interface StudentForm{
-//     sName : string;
-//     pass : string;
-//     email : string;
-//     sMob : number;
-//     address : string;
-//     altMob : number;
-//     guardian : string;
-//     sClass : number;
-//     basicFee : number;
-// }
-
 interface TeacherForm{
     tName : string;
     email : string;
@@ -23,18 +11,6 @@ interface TeacherForm{
     tClass : string;
     qualification : string;
 }
-
-// type StudentAction =
-// | { type: "sName"; payload: string }
-// | { type: "pass"; payload: string }
-// | { type: "email"; payload: string }
-// | { type: "sMob"; payload: number }
-// | { type: "sAddress"; payload: string }
-// | { type: "altMob"; payload: number }
-// | { type: "guardian"; payload: string }
-// | { type: "sClass"; payload: number }
-// | { type: "basicFee"; payload: number }
-// | { type: "reset"};
 
 type TeacherAction =
 | { type: "tName", payload: string }
@@ -46,32 +22,6 @@ type TeacherAction =
 | { type: "qualification", payload: string }
 | { type: "reset"};
 
-// function reducer(state : StudentForm, action : StudentAction) : StudentForm{
-//     switch(action.type){
-//         case "sName":
-//             return {...state, sName : action.payload};
-//         case "pass":
-//             return {...state, pass : action.payload};
-//         case "email":
-//             return {...state, email : action.payload};
-//         case "sMob":
-//             return {...state, sMob : isNaN(action.payload) ? 0 : action.payload};
-//         case "sAddress":
-//             return {...state, address : action.payload};
-//         case "altMob":
-//             return {...state, altMob : isNaN(action.payload) ? 0 : action.payload};
-//         case "guardian":
-//             return {...state, guardian : action.payload};
-//         case "sClass":
-//             return {...state, sClass : isNaN(action.payload) ? 0 : action.payload};
-//         case "basicFee":
-//             return {...state, basicFee : isNaN(action.payload) ? 0 : action.payload};
-//         case "reset":
-//             return initialStudents;
-//         default :
-//             return state;
-//     }
-// }
 
 function tReducer(state : TeacherForm, action : TeacherAction) : TeacherForm {
     switch(action.type){
@@ -95,18 +45,6 @@ function tReducer(state : TeacherForm, action : TeacherAction) : TeacherForm {
             return state;
     }
 }
-
-// const initialStudents : StudentForm = {
-//     sName : "",
-//     pass : "",
-//     email : "",
-//     sMob : 0,
-//     address : "",
-//     altMob : 0,
-//     guardian : "",
-//     sClass : 0,
-//     basicFee : 0
-// };
 
 const initialTeachers: TeacherForm = {
   tName: "",
@@ -137,17 +75,6 @@ type ExportRow = {
   password: string; // always default like Welcom@123
 };
 
-const DEFAULT_PASSWORD = "Welcom@123";
-
-function downloadCsv(filename: string, csvText: string) {
-  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 export default function useFuncs(){
     // const [studentForm, sDispatch] = useReducer(reducer, initialStudents);
@@ -156,9 +83,9 @@ const [importRows, setImportRows] = useState<TeacherForm[]>([]);
 const [importing, setImporting] = useState<boolean>(false);
 
     const [showCsvModal, setShowCsvModal] = useState(false);
-const [csvFile, setCsvFile] = useState<File | null>(null);
-const [uploading, setUploading] = useState(false);
-
+    const [csvFile, setCsvFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [role, setRole] = useState<RoleType>("teacher");
     const token = useAppSelector((state) => state.auth.token);
     const [search, setSearch] = useState<string>("");
@@ -176,7 +103,7 @@ const [uploading, setUploading] = useState(false);
       return;
     }
 
-    const res = await fetch("http://localhost:8080/teacherNames", {
+    const res = await fetch("http://localhost:8080/teacher/teacherNames", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -210,7 +137,6 @@ async function uploadTeachersCsv(file: File) {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      // ❌ DO NOT set Content-Type for FormData
     },
     body: fd,
   });
@@ -218,7 +144,7 @@ async function uploadTeachersCsv(file: File) {
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error ?? "IMPORT_FAILED");
   console.log("Request went successfully");
-  return data; // ImportResult
+  return data;
 }
 
 async function downloadTeachersCsv() {
@@ -281,35 +207,91 @@ async function downloadTeachersCsv() {
     const formError = validateForm();
     const isFormInvalid = Boolean(formError);
 
-    async function handleUserCreation(){
-        const error = validateForm();
-        let payload;
-        if(error !== null){
-            alert(error);
-            return;
-        }
-            payload = { role : "teacher", ...teacherForm};
-            tDispatch({ type : "reset"});
-        try {
-            const res = await fetch("http://localhost:8080/admin/teacher/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(payload),
-            });
-            if(res.ok){
-                fetchTeachers();
-            }
-            const data = await res.json();
-            console.log("User Created:", data);
-            return data;
-        } catch (err) {
-            console.error("Error creating user:", err);
-            return null;
-        }
+    // async function handleUserCreation(){
+    //     const error = validateForm();
+    //     let payload;
+    //     if(error !== null){
+    //         alert(error);
+    //         return;
+    //     }
+    //         payload = { role : "teacher", ...teacherForm};
+    //         tDispatch({ type : "reset"});
+    //     try {
+    //         const res = await fetch("http://localhost:8080/admin/teacher/register", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //             body: JSON.stringify(payload),
+    //         });
+    //         if(res.ok){
+    //             fetchTeachers();
+    //         }
+    //         const data = await res.json();
+    //         console.log("User Created:", data);
+    //         return data;
+    //     } catch (err) {
+    //         console.error("Error creating user:", err);
+    //         return null;
+    //     }
+    // }
+
+    async function handleUserCreation() {
+  const error = validateForm();
+  if (error !== null) {
+    alert(error);
+    return;
+  }
+
+  if (!token) {
+    alert("No token found");
+    return;
+  }
+
+  // backend expects CreateTeacherRequest inside `data`
+  const payload = {
+    role: "teacher",
+    ...teacherForm,
+  };
+
+  try {
+    const fd = new FormData();
+    fd.append("data", new Blob([JSON.stringify(payload)], { type: "application/json" }));
+
+    if (imageFile) fd.append("image", imageFile);
+
+    const res = await fetch("http://localhost:8080/admin/teacher/register-with-image", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: fd,
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      console.log("Create failed:", data);
+      alert(data?.error ?? "Error creating teacher");
+      return null;
     }
+
+    console.log("User Created:", data);
+
+    // reset form + image
+    tDispatch({ type: "reset" });
+    setImageFile(null);
+
+    // refresh list
+    fetchTeachers();
+    return data;
+  } catch (err) {
+    console.error("Error creating user:", err);
+    return null;
+  }
+}
+
 
     async function deleteTeacher(id: string) {
         if (!token) throw new Error("NO_TOKEN");
@@ -342,5 +324,9 @@ async function downloadTeachersCsv() {
     function handleUploading(val : boolean){
         setUploading(val);
     }
-    return {users, tDispatch, teacherForm, search, handleSearch, handleUserCreation, isFormInvalid, role, handleRole, downloadTeachersCsv, uploadTeachersCsv, fetchTeachers, showCsvModal, csvFile, uploading, handleShowCsvModal, handleCsvFile, handleUploading, deleteTeacher};
+
+    function handleImageFile(file : File | null){
+        setImageFile(file);
+    }
+    return {users, tDispatch, teacherForm, search, handleSearch, handleUserCreation, isFormInvalid, role, handleRole, downloadTeachersCsv, uploadTeachersCsv, fetchTeachers, showCsvModal, csvFile, uploading, handleShowCsvModal, handleCsvFile, handleUploading, deleteTeacher, imageFile, handleImageFile};
 }

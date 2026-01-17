@@ -41,10 +41,10 @@ export const hydrateAuth = createAsyncThunk(
     const me: MeResponse = await meRes.json(); // { id, role, mustChangePassword }
 
     // 2) profile endpoint
-    const profileUrl =
+    const profileUrl = me.role === "admin" ? `http://localhost:8080/admin/${me.id}` :
       me.role === "student"
         ? `http://localhost:8080/students/${me.id}`
-        : `http://localhost:8080/teachers/${me.id}`;
+        : `http://localhost:8080/teacher/${me.id}`;
 
     const profileRes = await fetch(profileUrl, {
       headers: { Authorization: `Bearer ${token}` },
@@ -52,6 +52,7 @@ export const hydrateAuth = createAsyncThunk(
 
     const profile = profileRes.ok ? await profileRes.json() : null;
 
+    console.log(profile);
     return {
       token,
       id: me.id,

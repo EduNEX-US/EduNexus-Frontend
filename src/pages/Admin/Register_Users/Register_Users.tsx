@@ -2,13 +2,13 @@ import {Section, Div, Button, Input, Span} from '../../../Components/Assembler';
 import useFuncs from './Functionality';
 import type { RoleType } from './Functionality';
 export default function Register_Users(){
-    const {users, tDispatch, teacherForm, search, handleSearch, role, handleRole, handleUserCreation, isFormInvalid, uploadTeachersCsv, downloadTeachersCsv, fetchTeachers, showCsvModal, csvFile, uploading, handleShowCsvModal, handleCsvFile, handleUploading, deleteTeacher} = useFuncs();
+    const {users, tDispatch, teacherForm, search, handleSearch, role, handleRole, handleUserCreation, isFormInvalid, uploadTeachersCsv, downloadTeachersCsv, fetchTeachers, showCsvModal, csvFile, uploading, handleShowCsvModal, handleCsvFile, handleUploading, deleteTeacher, imageFile, handleImageFile} = useFuncs();
 
     const filteredUsers = users![role].filter((u) =>
         u.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const formFilled : boolean = teacherForm.tAddress === "" || teacherForm.email === "" || teacherForm.exp === 0 || teacherForm.qualification === "" || teacherForm.tClass === "" || teacherForm.tMob === 0 || teacherForm.tName === "";
+    // const formFilled : boolean = teacherForm.tAddress === "" || teacherForm.email === "" || teacherForm.exp === 0 || teacherForm.qualification === "" || teacherForm.tClass === "" || teacherForm.tMob === 0 || teacherForm.tName === "";
     return <Section cn="h-screen flex flex-col p-4 md:p-0 md:w-[95%] gap-y-8 bg-orange-100">
         <h2 className="text-xl lg:text-3xl font-semibold flex items-center mb-2 mt-8 text-amber-900">Register Users</h2>
         <Div cn='overflow-y-auto flex-1 mt-0 border-3 border-orange-300/50 gap-y-4 p-0'>
@@ -20,17 +20,81 @@ export default function Register_Users(){
               {/* Common Fields */}
               <Input inpTxt="Name" inpCN="text-sm lg:text-lg p-1 md:p-3 border rounded" labelCN='hidden' value={teacherForm.tName} onChange={(e) => tDispatch({type : "tName", payload : e.target.value})} labelTxt='name' type='text' forName='tName'/>
               <Input inpTxt="Email" inpCN="text-sm lg:text-lg p-1 md:p-3 border rounded" labelCN='hidden' value={teacherForm.email} onChange={(e) => tDispatch({type : "email", payload : e.target.value})} labelTxt='email' type='text' forName='email'/>
+                  <Input inpTxt="Mobile" labelCN='hidden' value={`${teacherForm.tMob === 0 ? "" : teacherForm.tMob}`} labelTxt='Mobile' type='phone' onChange={
+                    (e) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+    tDispatch({ type: "tMob", payload: digits === "" ? 0 : Number(digits) });
+  }
+                    } forName='tMobile' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
+                  <Input inpTxt="Classes (comma separated)" labelCN='hidden' value={`${teacherForm.tClass}`} labelTxt='Class' type='text' onChange={
+                    (e) => {
+    // allow only digits and commas
+    let cleaned = e.target.value.replace(/[^0-9,]/g, "");
 
-              {/* Teacher/Admin Fields */}
-              {(role === "teacher" || role === "admin") && (
-                <>
-                  <Input inpTxt="Mobile" labelCN='hidden' value={`${teacherForm.tMob === 0 ? "" : teacherForm.tMob}`} labelTxt='Mobile' type='phone' onChange={(e) => tDispatch({type : "tMob", payload : parseInt(e.target.value)})} forName='tMobile' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
-                  <Input inpTxt="Classes (comma separated)" labelCN='hidden' value={`${teacherForm.tClass}`} labelTxt='Class' type='text' onChange={(e) => tDispatch({type : "tClass", payload : e.target.value})} forName='tClass' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
-                                    <Input inpTxt="Experience (years)" labelCN='hidden' value={`${teacherForm.exp === 0 ? "" : teacherForm.exp}`} labelTxt='Class' type='number' onChange={(e) => tDispatch({type : "exp", payload : parseInt(e.target.value)})} forName='experience' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
+    // collapse multiple commas
+    cleaned = cleaned.replace(/,+/g, ",");
+
+    // detect if user currently has a trailing comma (so we keep it)
+    const hasTrailingComma = cleaned.endsWith(",");
+
+    // trim leading comma; keep trailing comma for now (we'll re-add if needed)
+    cleaned = cleaned.replace(/^,/, "");
+
+    const parts = cleaned.split(",");
+
+    // validate each number segment (ignore empty last segment while typing)
+    const validParts = parts.filter((p, idx) => {
+      if (p === "") return idx === parts.length - 1; // allow last empty only while typing
+      const n = Number(p);
+      return Number.isInteger(n) && n >= 1 && n <= 12;
+    });
+
+    // rebuild
+    let normalized = validParts.join(",");
+
+    // if user typed trailing comma, preserve it (but avoid double comma)
+    if (hasTrailingComma && normalized !== "" && !normalized.endsWith(",")) {
+      normalized += ",";
+    }
+
+    tDispatch({ type: "tClass", payload: normalized });
+  }
+                    } forName='tClass' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
+                  <Input inpTxt="Experience (years)" labelCN='hidden' value={`${teacherForm.exp}`} labelTxt='Class' type='number' onChange={
+                    (e) => {
+                      const val = parseInt(e.target.value) > 50 ? 50 : parseInt(e.target.value) < 0 ? 0 : parseInt(e.target.value);
+                      tDispatch({type : "exp", payload : val})}} forName='experience' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
+                      <Div cn="p-1 border rounded flex items-center gap-3 bg-white">
+                        <input
+                          id="lost-image"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageFile(e.target.files?.[0] ?? null)}
+                        />
+                      
+                        <label
+                          htmlFor="lost-image"
+                          className="px-4 py-2 rounded bg-teal-500 text-white cursor-pointer hover:bg-teal-600 whitespace-nowrap"
+                        >
+                          Upload Image
+                        </label>
+                      
+                        <Span cn="text-sm text-gray-700 truncate">
+                          {imageFile ? imageFile.name : "No file selected"}
+                        </Span>
+                      
+                        {imageFile && (
+                          <Button
+                            cn="ml-auto text-sm text-red-600 hover:underline"
+                            onClick={() => handleImageFile(null)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </Div>
                   <Input inpTxt="Address" inpCN={`p-1 text-sm lg:text-lg md:p-3 border rounded col-span-1 md:col-span-2`} labelCN='hidden' value={`${teacherForm.tAddress}`} labelTxt='Address' type='text' forName='address' onChange={(e) => tDispatch({type : "tAddress", payload : e.target.value})}/>
                   <Input inpTxt="Qualification" inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded col-span-1" labelCN='hidden' value={`${teacherForm.qualification}`} labelTxt='qualification' type='text' forName='qualification'  onChange={(e) => tDispatch({type : "qualification", payload : e.target.value})}/>
-                </>
-              )}
             </Div>
 
             <Button 
