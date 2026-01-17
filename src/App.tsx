@@ -4,7 +4,7 @@ import {createBrowserRouter, RouterProvider} from 'react-router'
 import Student_View from './pages/Student/Studen_View/Student_View'
 import Teacher_View from './pages/Teacher/Teacher_View/Teacher_View'
 import Admin_View from './pages/Admin/Admin_view/Admin_View'
-import VideoCaller from './pages/Student/PTM/VideoCaller'
+// import VideoCaller from './pages/Student/PTM/VideoCaller'
 import AuthLoader from './features/auth/AuthLoader'
 import ProtectedRoute from './pages/Login/ProtectedRoute'
 import ChangePassword from './pages/Login/ChangePassword'
@@ -37,10 +37,10 @@ const router = createBrowserRouter([
         <Admin_View />
       </ProtectedRoute>
   },
-  {
-    path : '/ptm',
-    element : <VideoCaller />
-  }
+  // {
+  //   path : '/ptm',
+  //   element : <VideoCaller />
+  // }
 ])
 function App() {
 

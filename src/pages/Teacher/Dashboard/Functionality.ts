@@ -1,26 +1,80 @@
-import {useState} from 'react';
+import { useEffect, useState } from "react";
+import { useAppSelector } from "../../../hooks/useAppSelector";
 
-export type active = "dashboard" | "marks" | "lost&found" | "ptm";
+export type TeacherProfile = {
+  id: string;
+  name: string;
+  email: string;
+  mobile: string | number;
+  exp: number;
+  address: string;
+  tClass: string;
+  qualification: string;
+  imageUrl: string;
+  students: number,
+  ptmMeetings: number
+};
 
-export default function useFuncs(){
-  const [ptmMeetings, setPtmMeetings] = useState([
-    { id: 1, studentName: "John Smith", parentName: "Mr. Robert Smith", date: "2024-11-25", time: "10:00 AM", status: "scheduled", type: "online", meetingLink: "zoom.us/j/123456" },
-    { id: 2, studentName: "Emma Wilson", parentName: "Mrs. Linda Wilson", date: "2024-11-25", time: "11:00 AM", status: "scheduled", type: "in-person", location: "Staff Room" },
-    { id: 3, studentName: "Michael Brown", parentName: "Mr. David Brown", date: "2024-11-23", time: "2:00 PM", status: "completed", type: "online", notes: "Discussed academic progress" },
-    { id: 4, studentName: "Sophia Davis", parentName: "Mrs. Emily Davis", date: "2024-11-24", time: "3:00 PM", status: "ongoing", type: "online", meetingLink: "zoom.us/j/789012" }
-  ]);
-  const teacherProfile = {
-    name: "Dr. Sarah Johnson",
-    employeeId: "TCH001",
-    email: "sarah.johnson@school.com",
-    phone: "+1 234-567-8901",
-    subject: "Mathematics",
-    qualification: "PhD in Mathematics",
-    experience: "12 years",
-    joiningDate: "August 15, 2012",
-    classes: ["10A - Mathematics", "10B - Mathematics", "11A - Advanced Math"],
-    totalStudents: 87,
-    avatar: "SJ"
+export default function useFuncs() {
+  const token = useAppSelector((state) => state.auth.token);
+
+  // ✅ change this based on your redux shape
+  const teacherId = useAppSelector((state: any) => state.auth.id);
+
+  const [teacherProfile, setTeacherProfile] = useState<TeacherProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState("");
+
+  useEffect(() => {
+    if (!token || !teacherId) return;
+    fetchTeacherProfileById(teacherId);
+  }, [token, teacherId]);
+
+  async function fetchTeacherProfileById(id: string) {
+    try {
+      setProfileLoading(true);
+      setProfileError("");
+
+      const res = await fetch(`http://localhost:8080/teacher/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setTeacherProfile(null);
+        setProfileError(data?.error ?? "Failed to fetch profile");
+        return;
+      }
+
+
+      setTeacherProfile({
+        id: String(data.id ?? ""),
+        name: data.name ?? "",
+        email: data.email ?? "",
+        mobile: data.mobile ?? "",
+        exp: Number(data.exp ?? 0),
+        address: data.address ?? "",
+        tClass: data.tClass ?? "",
+        qualification: data.qualification ?? "",
+        imageUrl: data.imageUrl ?? "",
+        students: 20,
+        ptmMeetings: 3
+      });
+
+      console.log(data);
+    } catch {
+      setTeacherProfile(null);
+      setProfileError("Network error while fetching profile");
+    } finally {
+      setProfileLoading(false);
+    }
+  }
+
+  return {
+    teacherProfile,
+    profileLoading,
+    profileError,
+    fetchTeacherProfileById,
   };
-  return {ptmMeetings, teacherProfile};
 }
