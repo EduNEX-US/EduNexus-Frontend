@@ -18,7 +18,7 @@ import { logout } from "../../../features/auth/authSlice";
 export default function Sidebar(props: HandleTab) {
   const { handleFunc, activeTab, handleBarsVisibility, barsVisibility } = props;
   console.log("Barsvisibility", barsVisibility);
-  const { navigate } = useFuncs();
+  const { handleLogout } = useFuncs();
 
   return <Section cn='md:w-[5%] h-1/7 bg-orange-100 flex md:flex-col justify-start items-center md:h-lvh '> {/* Sidebar Section */}
           {/* Div Holding Logo & Traversing Navs */}
@@ -68,7 +68,7 @@ export default function Sidebar(props: HandleTab) {
   
           {/* Logout Button */}
           <Div cn={`md:h-1/10 h-full hidden md:block  w-full ${barsVisibility ? "hidden" : ""} text-amber-600`}>
-              <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={()=>{}}>
+              <Button cn='w-full group text-xl h-full flex justify-center items-center hover:text-red-600 transition transition-all duration-400 ease cursor-pointer' onClick={handleLogout}>
                   <Span cn='text-sm lg:text-xl block mr-2'>
                       <FontAwesomeIcon icon={faArrowRightFromBracket} />
                   </Span>

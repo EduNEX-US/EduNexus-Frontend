@@ -8,7 +8,7 @@ interface TeacherForm{
     tMob : number;
     exp : number;
     tAddress : string;
-    tClass : string;
+    tClass : number;
     qualification : string;
 }
 
@@ -18,7 +18,7 @@ type TeacherAction =
 | { type: "tMob", payload: number }
 | { type: "exp", payload: number }
 | { type: "tAddress", payload: string }
-| { type: "tClass", payload: string }
+| { type: "tClass", payload: number }
 | { type: "qualification", payload: string }
 | { type: "reset"};
 
@@ -52,7 +52,7 @@ const initialTeachers: TeacherForm = {
   tMob: 0,
   exp: 0,
   tAddress: "",
-  tClass: "",
+  tClass: 1,
   qualification: "",
 };
 
@@ -82,6 +82,7 @@ export default function useFuncs(){
 const [importRows, setImportRows] = useState<TeacherForm[]>([]);
 const [importing, setImporting] = useState<boolean>(false);
 
+
     const [showCsvModal, setShowCsvModal] = useState(false);
     const [csvFile, setCsvFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -103,7 +104,7 @@ const [importing, setImporting] = useState<boolean>(false);
       return;
     }
 
-    const res = await fetch("http://localhost:8080/teacher/teacherNames", {
+    const res = await fetch("http://localhost:8080/admin/teachers", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -115,7 +116,7 @@ const [importing, setImporting] = useState<boolean>(false);
     }
 
     const data = await res.json();
-
+    console.log(data)
     setUsers({
       teacher: data.filter((d: { role: number }) => d.role === 0)
                   .map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })),
@@ -207,35 +208,7 @@ async function downloadTeachersCsv() {
     const formError = validateForm();
     const isFormInvalid = Boolean(formError);
 
-    // async function handleUserCreation(){
-    //     const error = validateForm();
-    //     let payload;
-    //     if(error !== null){
-    //         alert(error);
-    //         return;
-    //     }
-    //         payload = { role : "teacher", ...teacherForm};
-    //         tDispatch({ type : "reset"});
-    //     try {
-    //         const res = await fetch("http://localhost:8080/admin/teacher/register", {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //             body: JSON.stringify(payload),
-    //         });
-    //         if(res.ok){
-    //             fetchTeachers();
-    //         }
-    //         const data = await res.json();
-    //         console.log("User Created:", data);
-    //         return data;
-    //     } catch (err) {
-    //         console.error("Error creating user:", err);
-    //         return null;
-    //     }
-    // }
+
 
     async function handleUserCreation() {
   const error = validateForm();
@@ -328,5 +301,5 @@ async function downloadTeachersCsv() {
     function handleImageFile(file : File | null){
         setImageFile(file);
     }
-    return {users, tDispatch, teacherForm, search, handleSearch, handleUserCreation, isFormInvalid, role, handleRole, downloadTeachersCsv, uploadTeachersCsv, fetchTeachers, showCsvModal, csvFile, uploading, handleShowCsvModal, handleCsvFile, handleUploading, deleteTeacher, imageFile, handleImageFile};
+    return {users, tDispatch, teacherForm, search, handleSearch, handleUserCreation, isFormInvalid, role, handleRole, downloadTeachersCsv, uploadTeachersCsv, fetchTeachers,  handleShowCsvModal, handleCsvFile,showCsvModal, csvFile, uploading, handleUploading, deleteTeacher, imageFile, handleImageFile};
 }

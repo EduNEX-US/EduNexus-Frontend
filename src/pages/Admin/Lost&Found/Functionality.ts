@@ -11,6 +11,7 @@ export interface recordType {
   imageUrl?: string; // ✅ NEW
 }
 
+
 export default function useFuncs() {
   const [itemName, setItemName] = useState<string>("");
   const [itemDescription, setItemDescription] = useState<string>("");

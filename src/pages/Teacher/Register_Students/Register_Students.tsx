@@ -3,26 +3,26 @@ import useFuncs from "./Functionality";
 
 export default function Register_Students() {
   const {
-    teacherClasses,
+    students,
+    teacherClass,
     studentName,
     studentEmail,
     studentMobile,
     studentAltMobile,
     studentAddress,
     studentGuardian,
-    basicFee,
-    selectedClassForCreate,
-    filterClass,
-    visibleStudents,
+    imageFile,
+    deleteStudent,
+    uploadMyStudentsCsv,
+    downloadStudentsCsv,
+    handleShowCsvModal, handleCsvFile,showCsvModal, csvFile, uploading, handleUploading,
+    handleImageFile,
     handleStudentName,
     handleStudentEmail,
     handleStudentMobile,
     handleStudentAltMobile,
     handleStudentAddress,
     handleStudentGuardian,
-    handleBasicFee,
-    handleSelectedClassForCreate,
-    handleFilterClass,
     handleCreateStudent,
   } = useFuncs();
 
@@ -30,9 +30,7 @@ export default function Register_Students() {
     !studentName ||
     !studentEmail ||
     !studentMobile ||
-    !studentGuardian ||
-    !basicFee ||
-    !selectedClassForCreate;
+    !studentGuardian;
 
   return (
     <Section cn="w-full h-screen bg-orange-50 flex flex-col p-6">
@@ -51,18 +49,17 @@ export default function Register_Students() {
           <Div cn="grid grid-cols-1 md:grid-cols-3 gap-4 text-amber-600">
 
             {/* Class */}
-            <select
-              className="p-3 border rounded"
-              value={selectedClassForCreate}
-              onChange={(e) => handleSelectedClassForCreate(e.target.value)}
-            >
-              <option value="">Select Class</option>
-              {teacherClasses.map((cls) => (
-                <option key={cls} value={cls}>
-                  {cls}
-                </option>
-              ))}
-            </select>
+            <Input
+              disabled={true}
+              inpCN="p-3 border rounded"
+              labelCN="hidden"
+              value={teacherClass}
+              labelTxt="Class"
+              type="number"
+              forName="class"
+              onChange={()=>{}}
+              inpTxt="Class"
+            ></Input>
 
             <Input
               inpTxt="Student Name"
@@ -113,9 +110,10 @@ export default function Register_Students() {
               inpCN="p-3 border rounded"
               labelCN="hidden"
               value={`${studentMobile === 0 ? "" : studentMobile}`}
-              onChange={(e) =>
-                handleStudentMobile(parseInt(e.target.value))
-              }
+              onChange={(e) =>{
+              const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                handleStudentMobile(parseInt(digits))
+              }}
               labelTxt="mobile"
               type="tel"
               forName="mobile"
@@ -126,24 +124,43 @@ export default function Register_Students() {
               inpCN="p-3 border rounded"
               labelCN="hidden"
               value={`${studentAltMobile === 0 ? "" : studentAltMobile}`}
-              onChange={(e) =>
-                handleStudentAltMobile(parseInt(e.target.value))
-              }
+              onChange={(e) =>{
+                const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                handleStudentAltMobile(parseInt(digits))
+              }}
               labelTxt="altMobile"
               type="tel"
               forName="altMobile"
             />
-
-            <Input
-              inpTxt="Basic Fee"
-              inpCN="p-3 border rounded"
-              labelCN="hidden"
-              value={`${basicFee === 0 ? "" : basicFee}`}
-              onChange={(e) => handleBasicFee(parseInt(e.target.value))}
-              labelTxt="fee"
-              type="number"
-              forName="fee"
-            />
+            <Div cn="p-1 border rounded flex items-center gap-3 bg-white">
+                        <input
+                          id="lost-image"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageFile(e.target.files?.[0] ?? null)}
+                        />
+                      
+                        <label
+                          htmlFor="lost-image"
+                          className="px-4 py-2 rounded bg-teal-500 text-white cursor-pointer hover:bg-teal-600 whitespace-nowrap"
+                        >
+                          Upload Image
+                        </label>
+                      
+                        <Span cn="text-sm text-gray-700 truncate">
+                          {imageFile ? imageFile.name : "No file selected"}
+                        </Span>
+                      
+                        {imageFile && (
+                          <Button
+                            cn="ml-auto text-sm text-red-600 hover:underline"
+                            onClick={() => handleImageFile(null)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </Div>
           </Div>
 
           <Button
@@ -157,6 +174,11 @@ export default function Register_Students() {
           >
             Create Student
           </Button>
+                        <Button cn="mt-3 md:mt-6 bg-teal-500 text-white px-4 md:px-6 lg:text-lg text-sm md:ml-8 cursor-pointer py-2 rounded hover:bg-teal-600"
+  onClick={() => handleShowCsvModal(true)}
+>
+  Import Teachers (CSV)
+</Button>
         </Div>
 
         {/* ================= STUDENT LIST ================= */}
@@ -164,21 +186,22 @@ export default function Register_Students() {
 
           {/* FILTER */}
           <Div cn="flex items-center gap-4 mb-4">
-            <Span cn="font-semibold text-lg text-amber-900">
-              Filter by Class:
+            <Span cn="font-semibold text-lg bg-orange-400 text-orange-50 px-4 py-2 rounded">
+              Students
             </Span>
-            <select
-              className="p-2 border rounded bg-teal-500 text-white focus:outline-none cursor-pointer"
-              value={filterClass}
-              onChange={(e) => handleFilterClass(e.target.value)}
-            >
-              <option value="">All My Classes</option>
-              {teacherClasses.map((cls) => (
-                <option key={cls} value={cls}>
-                  {cls}
-                </option>
-              ))}
-            </select>
+            <Button
+      cn="px-3 py-2 rounded bg-teal-500 hover:bg-teal-600 cursor-pointer text-white"
+      onClick={async () => {
+        try {
+          await downloadStudentsCsv();
+        } catch (err) {
+          alert(String(err));
+        }
+      }}
+    >
+      Download CSV
+    </Button>
+            
           </Div>
 
           {/* TABLE */}
@@ -189,23 +212,21 @@ export default function Register_Students() {
                   <th className="p-3">Name</th>
                   <th className="p-3">Email</th>
                   <th className="p-3">Mobile</th>
-                  <th className="p-3">Class</th>
                   <th className="p-3">Guardian</th>
                   <th className="p-3">Fee</th>
                 </tr>
               </thead>
               <tbody>
-                {visibleStudents.map((s) => (
+                {students.map((s) => (
                   <tr
-                    key={s.sid}
+                    key={s.id}
                     className="border-b hover:bg-amber-100/40 transition"
                   >
-                    <td className="p-3">{s.sName}</td>
+                    <td className="p-3">{s.name}</td>
                     <td className="p-3">{s.email}</td>
-                    <td className="p-3">{s.mob}</td>
-                    <td className="p-3">{s.sClass}</td>
+                    <td className="p-3">{s.mobile}</td>
                     <td className="p-3">{s.guardian}</td>
-                    <td className="p-3">₹{s.basicFee}</td>
+                    <td className='p-3' onClick={()=> deleteStudent(s.id)}>X</td>
                   </tr>
                 ))}
               </tbody>
@@ -214,6 +235,79 @@ export default function Register_Students() {
 
         </Div>
       </Div>
+              {showCsvModal && (
+  <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="bg-white w-[90%] md:w-[450px] rounded-xl p-6 shadow-lg">
+
+      <h3 className="text-xl font-semibold text-amber-900 mb-2">
+        Import Teachers
+      </h3>
+      <p className="text-sm text-gray-500 mb-4">
+        Upload a CSV file to bulk-register teachers
+      </p>
+
+      {/* Upload box */}
+      <label className="border-2 border-dashed border-amber-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-amber-50">
+        <i className="fa-solid fa-file-csv text-4xl text-amber-400 mb-3"></i>
+
+        {csvFile ? (
+          <span className="text-amber-800 font-medium">
+            {csvFile.name}
+          </span>
+        ) : (
+          <span className="text-gray-500">
+            Click or drop CSV file here
+          </span>
+        )}
+
+        <input
+          type="file"
+          accept=".csv"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleCsvFile(file);
+          }}
+        />
+      </label>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3 mt-6">
+        <Button
+          cn="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+          onClick={() => {
+            handleCsvFile(null);
+            handleShowCsvModal(false);
+          }}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          disabled={!csvFile || uploading}
+          cn={`px-5 py-2 rounded text-white ${
+            csvFile ? "bg-teal-500 hover:bg-teal-600" : "bg-gray-400"
+          }`}
+          onClick={async () => {
+            if (!csvFile) return;
+            try {
+              handleUploading(true);
+              await uploadMyStudentsCsv(csvFile);
+              handleShowCsvModal(false);
+              handleCsvFile(null);
+            } catch (err) {
+              alert(String(err));
+            } finally {
+              handleUploading(false);
+            }
+          }}
+        >
+          {uploading ? "Uploading..." : "Upload"}
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
     </Section>
   );
 }
