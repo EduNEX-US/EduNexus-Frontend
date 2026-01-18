@@ -22,11 +22,11 @@ export default function Sidebar( props : HandleTab){
                         <FontAwesomeIcon icon={faBookOpen}></FontAwesomeIcon>
                     </Span>
                 </Button>
-                <Button cn={` w-full group h-[10%] text-xl ${activeTab === "attendance" ? "bg-orange-400 text-orange-50" : "hover:bg-orange-400 hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-orange-50"}  transition transition-all duration-400 ease cursor-pointer`} onClick={()=> handleFunc("attendance")}>
+                {/* <Button cn={` w-full group h-[10%] text-xl ${activeTab === "attendance" ? "bg-orange-400 text-orange-50" : "hover:bg-orange-400 hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-orange-50"}  transition transition-all duration-400 ease cursor-pointer`} onClick={()=> handleFunc("attendance")}>
                     <Span cn={`text-sm rounded size-full flex items-center justify-center lg:text-xl block`}>
                         <FontAwesomeIcon icon={faCalendarCheck} />
                     </Span>
-                </Button>
+                </Button> */}
                 <Button cn={` w-full group h-[10%] text-xl ${activeTab === "register users" ? "bg-orange-400 text-orange-50" : "hover:bg-orange-400 hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-orange-50"}  transition transition-all duration-400 ease cursor-pointer`} onClick={()=> handleFunc("register users")}>
                     <Span cn={`text-sm rounded size-full flex items-center justify-center lg:text-xl block`}>
                         <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>

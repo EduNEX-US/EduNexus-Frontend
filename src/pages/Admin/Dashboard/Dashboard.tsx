@@ -89,12 +89,31 @@ export default function Dashboard(props : HandleTab){
                 {/* Image Holding Div */}
                 <Div cn='w-full h-1/3 flex justify-center items-center flex-col'>
                     {/* Substitute For Image */}
-                    <Span cn='bg-yellow-50 h-3/5 block w-1/3 text-amber-400 relative border-3 border-amber-400 m-1 text-[4rem] overflow-hidden rounded-full flex justify-center items-center'>
-                        <img src={`http://localhost:8080${adminDetails?.imageUrl}`} className='w-full h-full object-contain'></img>
-                        <FontAwesomeIcon icon={faPen} className='text-lg absolute left-1 bottom-1 cursor-pointer hover:text-cyan-500' onClick={openImageModal}></FontAwesomeIcon>
-                    </Span>
+                    <Span cn="bg-yellow-50 h-3/5 w-1/3 block relative 
+                 border-3 border-amber-400 m-1 
+                 rounded-full flex justify-center items-center">
+
+  {/* Image wrapper (only this is clipped) */}
+  <Span cn="absolute inset-0 rounded-full overflow-hidden">
+    <img
+      src={`http://localhost:8080${adminDetails?.imageUrl}`}
+      className="w-full h-full object-contain"
+      alt="profile"
+    />
+  </Span>
+
+  {/* Pen icon (NOT clipped) */}
+  <FontAwesomeIcon
+    icon={faPen}
+    className="text-lg absolute left-1 bottom-1 cursor-pointer 
+               bg-white p-1 text-amber-400 rounded-full shadow 
+               hover:text-cyan-500 z-10"
+    onClick={openImageModal}
+  />
+</Span>
+
                     {/* User Name */}
-                    <Span cn=' text-2xl font-semibold text-center text-amber-700'>Aman Kaushik</Span>
+                    <Span cn=' text-2xl font-semibold text-center text-amber-700'>{adminDetails?.name}</Span>
                 </Div>
                 {/* Personal Info Data */}
                 <Div cn='border-l-4 border-t-4 border-b-amber-300 h-2/3 border-amber-400 rounded-xl md:rounded-t-xl md:rounded-b-none flex flex-col justify-start items-center bg-yellow-200/50'>

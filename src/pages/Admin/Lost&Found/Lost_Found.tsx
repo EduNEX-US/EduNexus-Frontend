@@ -163,7 +163,7 @@ export default function Lost_Found() {
                     <td className="p-3">
                       <Button cn="cursor-pointer mr-4" onClick={()=> startEdit(record)}><FontAwesomeIcon icon={faPen}></FontAwesomeIcon></Button>
                       <Button cn="cursor-pointer text-red-500 hover:text-red-600" onClick={()=> handleDeleteItem(record.id)}>X</Button>
-                      </td>
+                    </td>
                   </tr>
                 ))}
               </tbody>

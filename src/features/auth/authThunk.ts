@@ -51,8 +51,6 @@ export const hydrateAuth = createAsyncThunk(
     });
 
     const profile = profileRes.ok ? await profileRes.json() : null;
-
-    console.log(profile);
     return {
       token,
       id: me.id,

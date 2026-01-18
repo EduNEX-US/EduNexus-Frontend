@@ -26,40 +26,10 @@ export default function Register_Users(){
     tDispatch({ type: "tMob", payload: digits === "" ? 0 : Number(digits) });
   }
                     } forName='tMobile' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
-                  <Input inpTxt="Classes (comma separated)" labelCN='hidden' value={`${teacherForm.tClass}`} labelTxt='Class' type='text' onChange={
+                  <Input inpTxt="Classes (comma separated)" labelCN='hidden' value={`${teacherForm.tClass}`} labelTxt='Class' type='number' onChange={
                     (e) => {
-    // allow only digits and commas
-    let cleaned = e.target.value.replace(/[^0-9,]/g, "");
-
-    // collapse multiple commas
-    cleaned = cleaned.replace(/,+/g, ",");
-
-    // detect if user currently has a trailing comma (so we keep it)
-    const hasTrailingComma = cleaned.endsWith(",");
-
-    // trim leading comma; keep trailing comma for now (we'll re-add if needed)
-    cleaned = cleaned.replace(/^,/, "");
-
-    const parts = cleaned.split(",");
-
-    // validate each number segment (ignore empty last segment while typing)
-    const validParts = parts.filter((p, idx) => {
-      if (p === "") return idx === parts.length - 1; // allow last empty only while typing
-      const n = Number(p);
-      return Number.isInteger(n) && n >= 1 && n <= 12;
-    });
-
-    // rebuild
-    let normalized = validParts.join(",");
-
-    // if user typed trailing comma, preserve it (but avoid double comma)
-    if (hasTrailingComma && normalized !== "" && !normalized.endsWith(",")) {
-      normalized += ",";
-    }
-
-    tDispatch({ type: "tClass", payload: normalized });
-  }
-                    } forName='tClass' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
+                      const val = parseInt(e.target.value) > 12 ? 12 : parseInt(e.target.value) < 0 ? 1 : parseInt(e.target.value);
+                      tDispatch({type : "tClass", payload : val})}} forName='tClass' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
                   <Input inpTxt="Experience (years)" labelCN='hidden' value={`${teacherForm.exp}`} labelTxt='Class' type='number' onChange={
                     (e) => {
                       const val = parseInt(e.target.value) > 50 ? 50 : parseInt(e.target.value) < 0 ? 0 : parseInt(e.target.value);
