@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Section, Div, Button, Span } from "../../../Components/Assembler";
-import { lostFoundItems } from "./Functionality";
+import useFuncs from "./Functionality";
 import {
   faLocationDot,
   faSearch,
@@ -9,6 +9,16 @@ import {
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
 
 export default function Lost_Found() {
+  const {items,
+    itemsLoading,
+    itemsError,
+    fetchItems,
+    // claim
+    claimItem,
+    claimingItemId,
+    claimError,
+    claimSuccess} = useFuncs();
+
   return (
     <Section
       cn="
@@ -21,16 +31,16 @@ export default function Lost_Found() {
         Lost & Found Items
       </h2>
 
-      {lostFoundItems.length === 0 ? (
+      {items.length === 0 ? (
         <Div cn="flex flex-col items-center justify-center py-20 text-amber-700">
           <FontAwesomeIcon icon={faSearch} className="text-4xl mb-3" />
           <Span cn="">No items in Lost & Found</Span>
         </Div>
       ) : (
         <Div cn="space-y-5 overflow-y-auto">
-          {lostFoundItems.map((item) => (
+          {items.map((item) => (
             <Div
-              key={item.id}
+              key={item.itemId}
               cn="
                 bg-white/70 border border-amber-200/40 rounded-2xl
                 shadow-sm hover:shadow-md transition
@@ -39,25 +49,31 @@ export default function Lost_Found() {
             >
               {/* IMAGE SLOT */}
               <Div
-                cn="
-                  w-28 h-28 rounded-xl border border-amber-200/40
-                  bg-amber-100/50 flex items-center justify-center
-                  text-amber-500 flex-shrink-0
-                "
-              >
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.item}
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                ) : (
-                  <Div cn="flex flex-col items-center text-xs text-center">
-                    <FontAwesomeIcon icon={faImage} className="text-xl mb-1" />
-                    <Span cn="">Image not available</Span>
-                  </Div>
-                )}
-              </Div>
+  cn="
+    w-28 h-28 rounded-xl border border-amber-200/40
+    bg-amber-100/50 flex items-center justify-center
+    text-amber-500 flex-shrink-0
+    overflow-hidden
+  "
+>
+  {item.imageUrl ? (
+    <img
+      className="w-full h-full object-cover"
+      src={
+        item.imageUrl?.startsWith("http")
+          ? item.imageUrl
+          : `http://localhost:8080${item.imageUrl}`
+      }
+      alt={item.itemName}
+    />
+  ) : (
+    <Div cn="flex flex-col items-center text-xs text-center">
+      <FontAwesomeIcon icon={faImage} className="text-xl mb-1" />
+      <Span cn="">Image not available</Span>
+    </Div>
+  )}
+</Div>
+
 
               {/* CONTENT */}
               <Div cn="flex-1 flex flex-col justify-between">
@@ -66,34 +82,30 @@ export default function Lost_Found() {
                 <Div cn="">
                   <Div cn="flex items-center gap-3">
                     <h3 className="font-semibold text-amber-900">
-                      {item.item}
+                      {item.itemName}
                     </h3>
 
                     <Span
                       cn={`
                         px-2 py-0.5 rounded-full text-xs font-medium
                         ${
-                          item.status === "Found"
+                          item.delivered
                             ? "bg-teal-100 text-teal-700"
                             : "bg-amber-100 text-amber-700"
                         }
                       `}
                     >
-                      {item.status}
+                      {item.delivered}
                     </Span>
                   </Div>
 
-                  {item.description && (
+                  {item.itemDescription && (
                     <p className="text-sm text-amber-700 mt-1">
-                      {item.description}
+                      {item.itemDescription}
                     </p>
                   )}
 
                   <Div cn="flex flex-wrap gap-4 mt-3 text-xs text-amber-600">
-                    <Span cn="flex items-center gap-1">
-                      <FontAwesomeIcon icon={faLocationDot} />
-                      {item.location}
-                    </Span>
 
                     <Span cn="flex items-center gap-1">
                       <FontAwesomeIcon icon={faCalendar} />
@@ -103,7 +115,7 @@ export default function Lost_Found() {
                 </Div>
 
                 {/* ACTION */}
-                {item.status === "Found" && (
+                {!item.delivered && (
                   <Div cn="mt-4">
                     <Button
                       cn="
@@ -112,7 +124,7 @@ export default function Lost_Found() {
                         hover:bg-teal-500 transition
                         cursor-pointer
                       "
-                      onClick={() => {}}
+                      onClick={() => claimItem(item.itemId)}
                     >
                       Claim Item
                     </Button>
