@@ -16,6 +16,26 @@ export type TeacherProfile = {
   ptmMeetings: number;
 };
 
+// ✅ claim types (based on backend LostFoundClaim)
+export type LostFoundItem = {
+  itemId: string;
+  itemName: string;
+  itemDescription: string;
+  delivered: boolean;
+  date: string;
+  assignedTo: string;
+  imageUrl: string;
+};
+
+export type LostFoundClaim = {
+  id: number;
+  studentId: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+
+  item: LostFoundItem;
+};
+
 export default function useFuncs() {
   const token = useAppSelector((state) => state.auth.token);
   const teacherId = useAppSelector((state: any) => state.auth.id);
@@ -34,6 +54,12 @@ export default function useFuncs() {
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [studentsError, setStudentsError] = useState("");
 
+  // ✅ Lost & Found claims state (for THIS teacher only)
+  const [claims, setClaims] = useState<LostFoundClaim[]>([]);
+  const [claimsLoading, setClaimsLoading] = useState(false);
+  const [claimsError, setClaimsError] = useState("");
+  const [actingClaimId, setActingClaimId] = useState<number | null>(null);
+
   useEffect(() => {
     if (!token || !teacherId) return;
     fetchTeacherProfileById(teacherId);
@@ -43,6 +69,8 @@ export default function useFuncs() {
     if (!token) return;
     fetchNotices();
     fetchStudentsCount();
+    fetchPendingClaims(); // ✅ claims for this teacher
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, teacherProfile?.tClass]);
 
   async function fetchTeacherProfileById(id: string) {
@@ -104,7 +132,6 @@ export default function useFuncs() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data?.error ?? "UPDATE_FAILED");
 
-    // ✅ update local teacherProfile immediately (same response shape as GET /teacher/{id})
     setTeacherProfile((prev) => {
       if (!prev) return prev;
       return {
@@ -117,83 +144,146 @@ export default function useFuncs() {
       };
     });
 
-    // ✅ If you want to re-fetch completely, uncomment:
-    // if (teacherId) await fetchTeacherProfileById(teacherId);
-
     return data;
   }
 
-async function fetchNotices() {
-  try {
-    setNoticesLoading(true);
-    setNoticesError("");
+  async function fetchNotices() {
+    try {
+      setNoticesLoading(true);
+      setNoticesError("");
 
-    const res = await fetch(`http://localhost:8080/notice`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const res = await fetch(`http://localhost:8080/notice`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const data = await res.json().catch(() => ([]));
+      const data = await res.json().catch(() => ([]));
 
-    if (!res.ok) {
+      if (!res.ok) {
+        setNotices([]);
+        setNoticesError((data as any)?.error ?? "Failed to fetch notices");
+        return;
+      }
+
+      setNotices(Array.isArray(data) ? data : []);
+    } catch {
       setNotices([]);
-      setNoticesError((data as any)?.error ?? "Failed to fetch notices");
-      return;
+      setNoticesError("Network error while fetching notices");
+    } finally {
+      setNoticesLoading(false);
     }
-
-    setNotices(Array.isArray(data) ? data : []);
-    console.log(data);
-  } catch {
-    setNotices([]);
-    setNoticesError("Network error while fetching notices");
-  } finally {
-    setNoticesLoading(false);
   }
-}
 
   // ✅ Fetch Students Count
-async function fetchStudentsCount() {
-  try {
-    if (!token) return;
+  async function fetchStudentsCount() {
+    try {
+      if (!token) return;
 
-    const clsRaw = teacherProfile?.tClass ?? "";
-    if (!clsRaw) return;
+      const clsRaw = teacherProfile?.tClass ?? "";
+      if (!clsRaw) return;
 
-    setStudentsLoading(true);
-    setStudentsError("");
+      setStudentsLoading(true);
+      setStudentsError("");
 
-    const classId = encodeURIComponent(String(clsRaw));
+      const classId = encodeURIComponent(String(clsRaw));
 
-    const res = await fetch(
-      `http://localhost:8080/teacher/students/class/${classId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      const res = await fetch(`http://localhost:8080/teacher/students/class/${classId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const data = await res.json().catch(() => ([]));
+      const data = await res.json().catch(() => ([]));
 
-    if (!res.ok) {
+      if (!res.ok) {
+        setStudentsCount(0);
+        setStudentsError((data as any)?.error ?? "Failed to fetch students count");
+        return;
+      }
+
+      const count = Array.isArray(data) ? data.length : 0;
+      setStudentsCount(count);
+
+      setTeacherProfile((prev) => (prev ? { ...prev, students: count } : prev));
+    } catch {
       setStudentsCount(0);
-      setStudentsError(data?.error ?? "Failed to fetch students count");
-      return;
+      setStudentsError("Network error while fetching students count");
+    } finally {
+      setStudentsLoading(false);
     }
-
-    // ✅ data is already an array
-    const count = Array.isArray(data) ? data.length : 0;
-
-    setStudentsCount(count);
-
-    // reflect into teacherProfile
-    setTeacherProfile((prev) =>
-      prev ? { ...prev, students: count } : prev
-    );
-
-  } catch {
-    setStudentsCount(0);
-    setStudentsError("Network error while fetching students count");
-  } finally {
-    setStudentsLoading(false);
   }
-}
 
+  // ===================== LOST & FOUND CLAIMS =====================
+
+  // ✅ Only returns claims assigned to THIS teacher (backend must filter)
+  async function fetchPendingClaims() {
+    try {
+      if (!token) return;
+
+      setClaimsLoading(true);
+      setClaimsError("");
+
+      const res = await fetch("http://localhost:8080/lostfound/claims/pending", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json().catch(() => ([]));
+
+      if (!res.ok) {
+        setClaims([]);
+        setClaimsError((data as any)?.error ?? "Failed to fetch claims");
+        return;
+      }
+
+      setClaims(Array.isArray(data) ? data : []);
+    } catch {
+      setClaims([]);
+      setClaimsError("Network error while fetching claims");
+    } finally {
+      setClaimsLoading(false);
+    }
+  }
+
+  async function approveClaim(claimId: number) {
+    if (!token) throw new Error("NO_TOKEN");
+
+    try {
+      setActingClaimId(claimId);
+
+      const res = await fetch(`http://localhost:8080/lostfound/claims/${claimId}/approve`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error ?? "APPROVE_FAILED");
+
+      // ✅ remove from list instantly
+      setClaims((prev) => prev.filter((c) => c.id !== claimId));
+      return data;
+    } finally {
+      setActingClaimId(null);
+    }
+  }
+
+  async function rejectClaim(claimId: number) {
+    if (!token) throw new Error("NO_TOKEN");
+
+    try {
+      setActingClaimId(claimId);
+
+      const res = await fetch(`http://localhost:8080/lostfound/claims/${claimId}/reject`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error ?? "REJECT_FAILED");
+
+      // ✅ remove from list instantly
+      setClaims((prev) => prev.filter((c) => c.id !== claimId));
+      return data;
+    } finally {
+      setActingClaimId(null);
+    }
+  }
 
   return {
     teacherProfile,
@@ -212,5 +302,14 @@ async function fetchStudentsCount() {
     studentsLoading,
     studentsError,
     fetchStudentsCount,
+
+    // ✅ claims
+    claims,
+    claimsLoading,
+    claimsError,
+    fetchPendingClaims,
+    approveClaim,
+    rejectClaim,
+    actingClaimId,
   };
 }

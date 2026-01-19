@@ -13,6 +13,7 @@ import {
   faLocationDot,
   faIdCard,
   faImage,
+  faCalendarDays,
 } from "@fortawesome/free-solid-svg-icons";
 import useFuncs from "./Functionality";
 
@@ -32,6 +33,15 @@ export default function Dashboard(props: HandleTab) {
 
     // ✅ students count
     studentsCount,
+
+    // ✅ claims
+    claims,
+    claimsLoading,
+    claimsError,
+    fetchPendingClaims,
+    approveClaim,
+    rejectClaim,
+    actingClaimId,
   } = useFuncs();
 
   // ---------- Safe values ----------
@@ -67,10 +77,8 @@ export default function Dashboard(props: HandleTab) {
       address: address ?? "",
     });
 
-    // reset image selection each time profile changes
     setImageFile(null);
     setImagePreview("");
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teacherProfile?.name, phone, email, address]);
 
@@ -91,17 +99,13 @@ export default function Dashboard(props: HandleTab) {
   function onPickImage(file?: File) {
     if (!file) return;
 
-    const ok =
-      file.type.startsWith("image/") &&
-      file.size <= 3 * 1024 * 1024; // 3MB max (change if you want)
-
+    const ok = file.type.startsWith("image/") && file.size <= 3 * 1024 * 1024;
     if (!ok) {
       alert("Please select an image file (max 3MB).");
       return;
     }
 
     setImageFile(file);
-
     const url = URL.createObjectURL(file);
     setImagePreview(url);
   }
@@ -110,8 +114,6 @@ export default function Dashboard(props: HandleTab) {
     try {
       setSaving(true);
 
-      // ✅ payload keys MUST match backend TeacherUpdateRequest:
-      // name, email, mobile, address
       const payload = {
         name: form.name.trim(),
         email: form.email.trim(),
@@ -120,7 +122,6 @@ export default function Dashboard(props: HandleTab) {
       };
 
       await updateTeacherProfile(payload, imageFile);
-
       setShowEdit(false);
     } catch (e: any) {
       alert(e?.message ?? "Failed to update profile");
@@ -137,7 +138,7 @@ export default function Dashboard(props: HandleTab) {
           <Span cn="text-2xl font-bold text-amber-900">
             {profileLoading ? "Loading..." : `Welcome, ${teacherProfile?.name ?? "Teacher"}`}
           </Span>
-          <Span cn="text-sm text-amber-700">Dashboard • Profile & notices</Span>
+          <Span cn="text-sm text-amber-700">Dashboard • Profile & approvals</Span>
         </Div>
 
         <Div cn="flex items-center gap-3">
@@ -211,46 +212,141 @@ export default function Dashboard(props: HandleTab) {
         </Div>
       </Div>
 
-      {/* ================== TEACHER DETAILS CARD ================== */}
-      <Div cn="w-[95%] bg-white/80 rounded-2xl p-6 mb-8 border border-orange-200/40 shadow-sm shadow-orange-200/30">
-        <Span cn="text-xl font-bold text-amber-900">Your Details</Span>
-
-        <Div cn="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
-            <FontAwesomeIcon icon={faIdCard} className="text-amber-600" />
-            <Div>
-              <Span cn="text-xs text-amber-700">Teacher ID</Span>
-              <Span cn="block font-semibold text-amber-900">{teacherId}</Span>
-            </Div>
+      {/* ================== MAIN ROW: LEFT Claims | RIGHT Details bricks ================== */}
+      <Div cn="w-[95%] grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* LEFT: Claims (take 2 columns) */}
+        <Div cn="lg:col-span-2 bg-white/80 rounded-2xl p-6 border border-orange-200/40 shadow-sm shadow-orange-200/30">
+          <Div cn="flex items-center justify-between mb-4">
+            <Span cn="text-xl font-bold text-amber-900">Lost & Found Claims</Span>
+            <Button
+              cn="px-4 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition cursor-pointer"
+              onClick={fetchPendingClaims}
+            >
+              Refresh
+            </Button>
           </Div>
 
-          <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
-            <FontAwesomeIcon icon={faPhone} className="text-amber-600" />
-            <Div>
-              <Span cn="text-xs text-amber-700">Mobile</Span>
-              <Span cn="block font-semibold text-amber-900">{String(phone) || "-"}</Span>
+          {claimsError && (
+            <Div cn="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3">
+              {claimsError}
             </Div>
-          </Div>
+          )}
 
-          <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
-            <FontAwesomeIcon icon={faEnvelope} className="text-amber-600" />
-            <Div>
-              <Span cn="text-xs text-amber-700">Email</Span>
-              <Span cn="block font-semibold text-amber-900">{email || "-"}</Span>
+          {claimsLoading ? (
+            <Div cn="p-6 text-center text-amber-700">Loading claims...</Div>
+          ) : !claims || claims.length === 0 ? (
+            <Div cn="p-10 text-center text-amber-600 opacity-70">No pending claims for you</Div>
+          ) : (
+            <Div cn="space-y-3">
+              {claims.map((c) => (
+                <Div
+                  key={c.id}
+                  cn="p-4 rounded-xl bg-amber-50/80 border border-amber-200/40 shadow-sm"
+                >
+                  <Div cn="flex items-start justify-between gap-4">
+                    <Div cn="flex-1">
+                      <Span cn="font-semibold text-amber-900">
+                        {c.item?.itemName ?? "Item"} • ID: {c.item?.itemId ?? "-"}
+                      </Span>
+
+                      <Span cn="block text-sm text-amber-700 mt-1">
+                        Claimed by: <span className="font-semibold">{c.studentId}</span>
+                      </Span>
+
+                      <Span cn="block text-sm text-amber-700 mt-1">
+                        {c.item?.itemDescription ?? "-"}
+                      </Span>
+
+                      <Span cn="block text-xs text-amber-700 mt-2">
+                        Date: {c.item?.date ?? "-"}
+                      </Span>
+                    </Div>
+
+                    <Div cn="flex flex-col gap-2 min-w-[140px]">
+                      <Button
+                        cn={`px-4 py-2 rounded-lg text-white transition ${
+                          actingClaimId === c.id
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-teal-500 hover:bg-teal-600 cursor-pointer"
+                        }`}
+                        disabled={actingClaimId === c.id}
+                        onClick={async () => {
+                          try {
+                            await approveClaim(c.id);
+                          } catch (e: any) {
+                            alert(e?.message ?? "Approve failed");
+                          }
+                        }}
+                      >
+                        {actingClaimId === c.id ? "Processing..." : "Approve"}
+                      </Button>
+
+                      <Button
+                        cn={`px-4 py-2 rounded-lg text-white transition ${
+                          actingClaimId === c.id
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-red-500 hover:bg-red-600 cursor-pointer"
+                        }`}
+                        disabled={actingClaimId === c.id}
+                        onClick={async () => {
+                          try {
+                            await rejectClaim(c.id);
+                          } catch (e: any) {
+                            alert(e?.message ?? "Reject failed");
+                          }
+                        }}
+                      >
+                        {actingClaimId === c.id ? "Processing..." : "Reject"}
+                      </Button>
+                    </Div>
+                  </Div>
+                </Div>
+              ))}
             </Div>
-          </Div>
+          )}
+        </Div>
 
-          <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
-            <FontAwesomeIcon icon={faLocationDot} className="text-amber-600" />
-            <Div>
-              <Span cn="text-xs text-amber-700">Address</Span>
-              <Span cn="block font-semibold text-amber-900">{address || "-"}</Span>
+        {/* RIGHT: Teacher details bricks (ONLY these) */}
+        <Div cn="bg-white/80 rounded-2xl p-6 border border-orange-200/40 shadow-sm shadow-orange-200/30">
+          <Span cn="text-xl font-bold text-amber-900">Your Details</Span>
+
+          <Div cn="grid grid-cols-1 gap-4 mt-4">
+            <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
+              <FontAwesomeIcon icon={faIdCard} className="text-amber-600" />
+              <Div>
+                <Span cn="text-xs text-amber-700">Teacher ID</Span>
+                <Span cn="block font-semibold text-amber-900">{teacherId}</Span>
+              </Div>
+            </Div>
+
+            <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
+              <FontAwesomeIcon icon={faPhone} className="text-amber-600" />
+              <Div>
+                <Span cn="text-xs text-amber-700">Mobile</Span>
+                <Span cn="block font-semibold text-amber-900">{String(phone) || "-"}</Span>
+              </Div>
+            </Div>
+
+            <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
+              <FontAwesomeIcon icon={faEnvelope} className="text-amber-600" />
+              <Div>
+                <Span cn="text-xs text-amber-700">Email</Span>
+                <Span cn="block font-semibold text-amber-900">{email || "-"}</Span>
+              </Div>
+            </Div>
+
+            <Div cn="flex items-center gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200/40">
+              <FontAwesomeIcon icon={faLocationDot} className="text-amber-600" />
+              <Div>
+                <Span cn="text-xs text-amber-700">Address</Span>
+                <Span cn="block font-semibold text-amber-900">{address || "-"}</Span>
+              </Div>
             </Div>
           </Div>
         </Div>
       </Div>
 
-      {/* ================== NOTICES ONLY ================== */}
+      {/* ================== NOTICES UI (keep as is) ================== */}
       <Div cn="w-[95%] bg-white/80 rounded-2xl p-6 border border-orange-200/40 shadow-sm shadow-orange-200/30">
         <Div cn="flex items-center justify-between mb-4">
           <Div cn="flex items-center gap-2">
@@ -273,11 +369,16 @@ export default function Dashboard(props: HandleTab) {
         ) : (
           <Div cn="space-y-3">
             {notices.map((n: any) => (
-              <Div key={n.id} cn="p-4 rounded-xl bg-amber-50/80 border border-amber-200/40 shadow-sm">
+              <Div
+                key={n.id}
+                cn="p-4 rounded-xl bg-amber-50/80 border border-amber-200/40 shadow-sm"
+              >
                 <Div cn="flex items-start justify-between gap-4">
                   <Div cn="flex-1">
                     <Span cn="font-semibold text-amber-900">{n.title ?? "Notice"}</Span>
-                    <Span cn="block text-sm text-amber-700 mt-1">{n.body.slice(0,90) ?? "-"}</Span>
+                    <Span cn="block text-sm text-amber-700 mt-1">
+                      {n.body?.slice?.(0, 90) ?? "-"}
+                    </Span>
                   </Div>
                   <Span cn="text-xs text-amber-700 whitespace-nowrap">
                     {n.createdAt ? String(n.createdAt).slice(0, 10) : ""}
@@ -289,7 +390,7 @@ export default function Dashboard(props: HandleTab) {
         )}
       </Div>
 
-      {/* ================== EDIT PROFILE MODAL ================== */}
+      {/* ================== EDIT PROFILE MODAL (unchanged) ================== */}
       {showEdit && (
         <Div
           cn="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fadeIn"
@@ -339,13 +440,10 @@ export default function Dashboard(props: HandleTab) {
                   />
                 </label>
 
-                <Span cn="text-xs text-amber-700 opacity-80">
-                  JPG/PNG • Max 3MB
-                </Span>
+                <Span cn="text-xs text-amber-700 opacity-80">JPG/PNG • Max 3MB</Span>
               </Div>
             </Div>
 
-            {/* ✅ Only 4 fields */}
             <Div cn="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 labelCN="hidden"
