@@ -12,6 +12,8 @@ export const examSessionOptions = [
 
 export type BackendMarksRow = {
   id?: number;
+
+  examSession?: ExamSession | string | null;
   resultDate?: string | null;
 
   english?: number | null;
@@ -19,13 +21,10 @@ export type BackendMarksRow = {
   math?: number | null;
   science?: number | null;
 
-  // backend might send either gk/generalKnowledge
   gk?: number | null;
   generalKnowledge?: number | null;
 
-  // backend might send socialScience
   socialScience?: number | null;
-
   computer?: number | null;
 };
 
@@ -38,7 +37,7 @@ export type MarkEntry = {
 
 export interface ChartDataItem {
   name: string;
-  score: number; // percentage 0-100
+  score: number; // percentage
   fullName: string;
 }
 
@@ -59,64 +58,136 @@ function gradeFromPercent(p: number) {
   return "D";
 }
 
+function normalizeSession(v: any): ExamSession | null {
+  const s = String(v ?? "").trim().toUpperCase();
+  if (s === "UNIT_1") return "UNIT_1";
+  if (s === "MID_SEM") return "MID_SEM";
+  if (s === "UNIT_2") return "UNIT_2";
+  if (s === "END") return "END";
+  return null;
+}
+
 export default function useFuncs() {
   const token = useAppSelector((s) => s.auth.token);
   const profile = useAppSelector((s) => s.auth.profile);
 
+  // ✅ default is anything (will be replaced on first load by latest)
   const [selectedExam, setSelectedExam] = useState<ExamSession>("UNIT_1");
 
   const [rows, setRows] = useState<BackendMarksRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!token) return;
-    fetchMyMarks(selectedExam);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, selectedExam]);
+  // ✅ to prevent calling latest again and again
+  const [bootstrapped, setBootstrapped] = useState(false);
 
   function handleSelectedExam(val: ExamSession) {
     setSelectedExam(val);
   }
 
-  async function fetchMyMarks(examSession: ExamSession) {
-  try {
+  // ✅ 1) first open: get latest -> set selectedExam accordingly
+  useEffect(() => {
+    if (!token || bootstrapped) return;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch("http://localhost:8080/marks/me/latest", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const raw = await res.text();
+
+        if (!res.ok) {
+          // if token/role issue you'll see it here
+          setError(`Failed to load latest marks (${res.status})`);
+          setBootstrapped(true);
+          return;
+        }
+
+        const data = raw ? JSON.parse(raw) : null;
+
+        // data can be null if no marks exist
+        if (data && typeof data === "object") {
+          const latestSession = normalizeSession((data as any).examSession);
+          if (latestSession) {
+            // ✅ this will trigger the 2nd effect to fetch /marks/me for that session
+            setSelectedExam(latestSession);
+          } else {
+            // fallback: keep default
+          }
+        }
+
+        setBootstrapped(true);
+      } catch {
+        setError("Network error while fetching latest marks");
+        setBootstrapped(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [token, bootstrapped]);
+
+  // ✅ 2) whenever selectedExam changes (including after latest), fetch that session marks
+  useEffect(() => {
     if (!token) return;
+    // if you want: avoid fetching before latest bootstrap is done:
+    // if (!bootstrapped) return;
 
-    setLoading(true);
-    setError("");
+    fetchMyMarks(selectedExam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, selectedExam]);
 
-    const res = await fetch(
-      `http://localhost:8080/marks/me?examSession=${encodeURIComponent(examSession)}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  async function fetchMyMarks(examSession: ExamSession) {
+    try {
+      if (!token) return;
 
-    const data = await res.json().catch(() => null);
-    console.log("Marks API response:", data);
+      setLoading(true);
+      setError("");
 
-    if (!res.ok) {
+      const url = `http://localhost:8080/marks/me?examSession=${encodeURIComponent(
+        examSession
+      )}`;
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const rawText = await res.text();
+
+      if (!res.ok) {
+        // ✅ IMPORTANT: when no marks exist, backend returns null (200) in your current code.
+        // but if security blocks, you'll get 403 here, and show error.
+        setRows([]);
+
+        try {
+          const maybeJson = JSON.parse(rawText);
+          setError(maybeJson?.error ?? `Failed (${res.status})`);
+        } catch {
+          setError(`Failed (${res.status})`);
+        }
+        return;
+      }
+
+      const data = rawText ? JSON.parse(rawText) : null;
+
+      // Your backend /marks/me returns a single Marks or null.
+      // Normalize to array so rest of code works same.
+      const normalized =
+        Array.isArray(data) ? data : data && typeof data === "object" ? [data] : [];
+
+      setRows(normalized);
+    } catch {
       setRows([]);
-      setError((data as any)?.error ?? "Failed to fetch marks");
-      return;
+      setError("Network error while fetching marks");
+    } finally {
+      setLoading(false);
     }
-
-    // ✅ normalize: backend may return either array OR a single object
-    const normalized =
-      Array.isArray(data) ? data
-      : data && typeof data === "object" ? [data]
-      : [];
-
-    setRows(normalized);
-  } catch {
-    setRows([]);
-    setError("Network error while fetching marks");
-  } finally {
-    setLoading(false);
   }
-}
 
-
-  // ✅ pick the latest row if multiple rows are returned
+  // ✅ pick latest row if multiple
   const activeRow: BackendMarksRow | null = useMemo(() => {
     if (!rows || rows.length === 0) return null;
 
@@ -128,10 +199,9 @@ export default function useFuncs() {
   }, [rows]);
 
   const isPrimaryClass = useMemo(() => {
-    // adjust according to your profile shape
     const cls =
       Number(profile?.stud_class ?? profile?.studClass ?? profile?.classId ?? 0) || 0;
-    return cls < 5; // class < 5 => GK else SS
+    return cls < 5;
   }, [profile]);
 
   const entries: MarkEntry[] = useMemo(() => {
@@ -157,7 +227,6 @@ export default function useFuncs() {
       { subject: "Computer", value: computer },
     ];
 
-    // ✅ keep only subjects that have marks (null means not entered)
     return list
       .filter((x) => x.value !== null)
       .map((x) => {
@@ -209,7 +278,7 @@ export default function useFuncs() {
     loading,
     error,
 
-    // computed for UI
+    // computed
     entries,
     chartData,
     totals,
@@ -218,7 +287,7 @@ export default function useFuncs() {
     calculatePercentage,
     getGradeColor,
 
-    // manual refetch if you want
+    // optional
     fetchMyMarks,
   };
 }

@@ -4,23 +4,32 @@ import { useAppSelector } from "../../../hooks/useAppSelector";
 type AttendanceStatus = "Present" | "Absent" | "Late";
 
 interface AttendanceForm {
-  className: string;
   studentId: string;
   status: AttendanceStatus;
   date: string;
 }
 
-type AttendanceRow = {
-  id: string;
+// ✅ matches backend AttendanceTeacherRowDTO (/attendance/teacher/students)
+export type AttendanceMonthRow = {
+  studentId: string;
   name: string;
   email: string;
   address: string;
   guardian: string;
-  status: "PRESENT" | "ABSENT" | "LATE";
+  mobile?: string;
+
+  classId: number;
+  yearMonth: string;
+
+  totalDays: number | null;
+  present: number | null;
+  absent: number | null;
+  late: number | null;
+
+  uploaded: boolean;
 };
 
 const initialState: AttendanceForm = {
-  className: "",
   studentId: "",
   status: "Present",
   date: "",
@@ -28,88 +37,239 @@ const initialState: AttendanceForm = {
 
 function reducer(state: AttendanceForm, action: any): AttendanceForm {
   switch (action.type) {
-    case "class": return { ...state, className: action.payload };
-    case "student": return { ...state, studentId: action.payload };
-    case "status": return { ...state, status: action.payload };
-    case "date": return { ...state, date: action.payload };
-    case "reset": return initialState;
-    default: return state;
+    case "student":
+      return { ...state, studentId: action.payload };
+    case "status":
+      return { ...state, status: action.payload };
+    case "date":
+      return { ...state, date: action.payload };
+    case "reset":
+      return initialState;
+    default:
+      return state;
   }
+}
+
+// ✅ helper: YYYY-MM
+function currentMonthValue() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${yyyy}-${mm}`;
+}
+
+function toMonthIndex(yyyyMm: string) {
+  const [y, m] = yyyyMm.split("-").map(Number);
+  return y * 12 + (m - 1); // 0-based
+}
+
+function fromMonthIndex(idx: number) {
+  const y = Math.floor(idx / 12);
+  const m = (idx % 12) + 1;
+  return `${y}-${String(m).padStart(2, "0")}`;
+}
+
+// session starts in April and ends in March
+function sessionStartEnd(today: Date) {
+  const y = today.getFullYear();
+  const m = today.getMonth() + 1;
+
+  // if today is Jan/Feb/Mar => session started last year April
+  const startYear = m <= 3 ? y - 1 : y;
+  const start = `${startYear}-04`;
+  const end = `${startYear + 1}-03`;
+
+  return { start, end };
 }
 
 export default function useFuncs() {
   const token = useAppSelector((s) => s.auth.token);
+  const profile = useAppSelector((s) => s.auth.profile);
+
+  // ✅ class from teacher redux profile
+  const teacherClassId = Number((profile as any)?.tClass ?? 0) || 0;
+
   const [attendanceForm, dispatch] = useReducer(reducer, initialState);
 
   const [csvFile, setCsvFile] = useState<File | null>(null);
 
-  // ✅ NEW: view attendance list
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
-  const [marked, setMarked] = useState<boolean>(false);
-  const [rows, setRows] = useState<AttendanceRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  // ✅ Month picker (also used for fetch + upload)
+  const [yearMonth, setYearMonth] = useState<string>(currentMonthValue());
 
-  // keep your modal state same
+  // modal state
   const [showManual, setShowManual] = useState(false);
   const [showCSV, setShowCSV] = useState(false);
 
   const handleManualShow = (val: boolean) => setShowManual(val);
   const handleCSVShow = (val: boolean) => setShowCSV(val);
 
-  // ✅ Fetch attendance for date
-  async function fetchAttendanceForDate(dateStr: string) {
-    const classId = Number(attendanceForm.className);
-    if (!token || !classId) return;
+  // Month navigation boundaries (April -> March)
+  const { start: minMonth, end: maxMonth } = sessionStartEnd(new Date());
+  const canGoPrev = toMonthIndex(yearMonth) > toMonthIndex(minMonth);
+  const canGoNext = toMonthIndex(yearMonth) < toMonthIndex(maxMonth);
+
+  function goPrevMonth() {
+    if (!canGoPrev) return;
+    setYearMonth(fromMonthIndex(toMonthIndex(yearMonth) - 1));
+  }
+
+  function goNextMonth() {
+    if (!canGoNext) return;
+    setYearMonth(fromMonthIndex(toMonthIndex(yearMonth) + 1));
+  }
+
+  // ✅ Monthly teacher rows (table)
+  const [rows, setRows] = useState<AttendanceMonthRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  // status messaging
+  const [uploaded, setUploaded] = useState<boolean | null>(null); // null=loading/unknown
+  const [notUploadedMsg, setNotUploadedMsg] = useState<string>("");
+
+  // For UI label
+  const marked = rows.length > 0;
+
+  // ✅ Fetch monthly list (always returns students; each row says uploaded true/false)
+  async function fetchAttendanceForMonth(month: string) {
+    if (!token) return;
+    if (!teacherClassId) {
+      setError("No class assigned to teacher");
+      return;
+    }
 
     setLoading(true);
-    try {
-      const res = await fetch(
-        `http://localhost:8080/attendance/class/${classId}?date=${dateStr}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    setError("");
+    setNotUploadedMsg("");
+    setUploaded(null);
 
-      const data = await res.json();
-      console.log(data);
-      setMarked(Boolean(data.marked));
-      setRows(data.rows ?? []);
-    } catch {
-      setMarked(false);
+    try {
+      const url = `http://localhost:8080/attendance/teacher/students?classId=${encodeURIComponent(
+        teacherClassId
+      )}&yearMonth=${encodeURIComponent(month)}`;
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json().catch(() => ([]));
+
+      if (!res.ok) {
+        setRows([]);
+        setUploaded(false);
+        setError((data as any)?.error ?? `Failed (${res.status})`);
+        return;
+      }
+
+      const arr = Array.isArray(data) ? (data as AttendanceMonthRow[]) : [];
+      setRows(arr);
+
+      // if every row is uploaded=false => month not uploaded
+      const anyUploaded = arr.some((r) => r.uploaded === true);
+      setUploaded(anyUploaded);
+      if (!anyUploaded) setNotUploadedMsg("Attendance not uploaded for this month");
+    } catch (e: any) {
       setRows([]);
+      setUploaded(false);
+      setError(e?.message ?? "Network error while fetching attendance");
     } finally {
       setLoading(false);
     }
   }
 
-  // useEffect(()=>{
-  //   fetchAttendanceForDate()
-  // },[])
-  // ✅ when class changes or date changes → refetch
+  // ✅ Auto fetch when token/class/month ready
   useEffect(() => {
-    if (attendanceForm.className) {
-      fetchAttendanceForDate(selectedDate);
-    }
-  }, [attendanceForm.className, selectedDate]);
+    if (!token || !teacherClassId) return;
+    fetchAttendanceForMonth(yearMonth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, teacherClassId, yearMonth]);
 
-  // ✅ Date filter handler (use in UI date input)
-  function handleSelectedDate(val: string) {
-    setSelectedDate(val);
+  // ✅ Upload CSV (class from profile + yearMonth + file)
+  async function uploadCsv() {
+    if (!token) throw new Error("NO_TOKEN");
+    if (!teacherClassId) throw new Error("NO_CLASS_ASSIGNED");
+    if (!csvFile) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const fd = new FormData();
+      fd.append("classId", String(teacherClassId));
+      fd.append("yearMonth", yearMonth); // ✅ MUST MATCH controller param name
+      fd.append("file", csvFile);
+
+      const res = await fetch("http://localhost:8080/attendance/csv", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError((data as any)?.error ?? `CSV upload failed (${res.status})`);
+        return;
+      }
+
+      // ✅ close modal + reset
+      setCsvFile(null);
+      setShowCSV(false);
+
+      // ✅ refresh month list
+      fetchAttendanceForMonth(yearMonth);
+    } catch {
+      setError("Network error while uploading CSV");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // keep uploadCsv same for now, you’ll connect it later
-  const uploadCsv = () => {
-    if (!csvFile) return;
-    console.log("Uploading CSV:", csvFile);
-    setCsvFile(null);
-    setShowCSV(false);
-  };
+  // ✅ Update a single student's attendance for the month (PUT /attendance/teacher/{studentId}/{yearMonth}?classId=)
+  async function updateStudentMonth(
+    studentId: string,
+    month: string,
+    payload: { totalDays?: number; present?: number; absent?: number; late?: number }
+  ) {
+    if (!token) throw new Error("NO_TOKEN");
+    if (!teacherClassId) throw new Error("NO_CLASS_ASSIGNED");
+    if (!studentId) throw new Error("NO_STUDENT_ID");
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const url = `http://localhost:8080/attendance/teacher/${encodeURIComponent(
+        studentId
+      )}/${encodeURIComponent(month)}?classId=${encodeURIComponent(teacherClassId)}`;
+
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError((data as any)?.error ?? `Update failed (${res.status})`);
+        throw new Error((data as any)?.error ?? "UPDATE_FAILED");
+      }
+
+      // refresh list after update
+      await fetchAttendanceForMonth(month);
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleManualUpload = () => {
-    if (!attendanceForm.className || !attendanceForm.studentId || !attendanceForm.date) return;
-    console.log("Manual Attendance:", attendanceForm);
-    dispatch({ type: "reset" });
     setShowManual(false);
+    dispatch({ type: "reset" });
   };
 
   const handleESC = (e: KeyboardEvent) => {
@@ -120,24 +280,46 @@ export default function useFuncs() {
   };
 
   return {
+    teacherClassId,
+
     attendanceForm,
+    dispatch,
+
+    // ✅ csv + month
     csvFile,
+    setCsvFile,
+    yearMonth,
+    setYearMonth,
+
     showManual,
     showCSV,
-    dispatch,
-    setCsvFile,
-    uploadCsv,
-    handleManualUpload,
     handleManualShow,
     handleCSVShow,
     handleESC,
 
-    // ✅ NEW exports for view + filter
-    selectedDate,
-    handleSelectedDate,
-    marked,
+    uploadCsv,
+    handleManualUpload,
+
+    // ✅ monthly table state
     rows,
+    marked,
     loading,
-    fetchAttendanceForDate,
+    error,
+
+    // ✅ fetch + status
+    fetchAttendanceForMonth,
+    uploaded,
+    notUploadedMsg,
+
+    // ✅ month navigation
+    canGoPrev,
+    canGoNext,
+    goPrevMonth,
+    goNextMonth,
+    minMonth,
+    maxMonth,
+
+    // ✅ update student
+    updateStudentMonth,
   };
 }
