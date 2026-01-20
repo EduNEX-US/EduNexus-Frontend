@@ -17,7 +17,7 @@ export default function Teacher_View(){
             <Sidebar handleFunc={handleActiveTab} activeTab={activeTab}/>
             { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
             { activeTab === "marks" && <Marks /> }
-            {/* { activeTab === "attendance" && <Attendance /> } */}
+            { activeTab === "attendance" && <Attendance /> }
             { activeTab === "register users" && <Register_Students />}
             { activeTab === "lost&found" && <Lost_Found /> }
             { activeTab === "ptm" && <PTM /> }
