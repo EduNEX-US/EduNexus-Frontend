@@ -23,12 +23,26 @@ export type Notice = {
   createdAt?: string;
 };
 
+export type AttendanceSummary = {
+  totalDays: number;
+  present: number;
+  absent: number;
+  late: number;
+  percentage: number;
+};
+
+export type AttendanceMonthRow = {
+  yearMonth: string;
+  totalDays: number;
+  present: number;
+  absent: number;
+  late: number;
+  percentage: number;
+};
+
 export type ExamSession = "UNIT_1" | "MID_SEM" | "UNIT_2" | "END";
 
-/**
- * Your Marks entity returns ONE Marks row for latest (as per backend /marks/me/latest).
- * Adjust these keys if your Marks table uses different names.
- */
+// Get Latest Marks
 export type LatestMarksResponse = {
   id?: number;
   examSession?: ExamSession;
@@ -69,7 +83,6 @@ function safeText(v: any) {
 
 function formatDate(d?: string) {
   if (!d) return "";
-  // if backend sends "2025-11-18" keep it readable
   return d.length >= 10 ? d.slice(0, 10) : d;
 }
 
@@ -81,7 +94,6 @@ export const getGradeColor = (grade: string) => {
 };
 
 function calcGrade(pct: number) {
-  // basic school-style grading (change if you want)
   if (pct >= 90) return "A+";
   if (pct >= 80) return "A";
   if (pct >= 70) return "B+";
@@ -98,8 +110,6 @@ function toRecentTests(latest: LatestMarksResponse | null): RecentTestRow[] {
 
   for (const s of SUBJECTS) {
     const v = (latest as any)[s.key];
-
-    // Only include subject if marks exist (number)
     if (typeof v !== "number") continue;
 
     const pct = (v / s.total) * 100;
@@ -113,8 +123,12 @@ function toRecentTests(latest: LatestMarksResponse | null): RecentTestRow[] {
     });
   }
 
-  // keep top 3 only (Recent Tests panel)
   return rows.slice(0, 3);
+}
+
+function toNum(v: any, fallback = 0) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
 }
 
 /** ---------- Hook ---------- */
@@ -136,6 +150,12 @@ export default function useFuncs() {
   const [marksLoading, setMarksLoading] = useState(false);
   const [marksError, setMarksError] = useState("");
 
+  // ✅ ---------- Attendance summary ----------
+  const [attendanceSummary, setAttendanceSummary] = useState<AttendanceSummary | null>(null);
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [attendanceError, setAttendanceError] = useState("");
+    const [attendanceMonthly, setAttendanceMonthly] = useState<AttendanceMonthRow[]>([]);
+
   // ---------- Update profile ----------
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState("");
@@ -146,9 +166,13 @@ export default function useFuncs() {
     fetchStudentMe();
     fetchNotices();
     fetchLatestMarks();
+    fetchAttendanceSummary();
+    fetchAttendanceMonthly();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  
   /** ✅ GET /student/me */
   async function fetchStudentMe() {
     try {
@@ -185,6 +209,33 @@ export default function useFuncs() {
     }
   }
 
+
+async function fetchAttendanceMonthly() {
+  try {
+    setAttendanceLoading(true);
+    setAttendanceError("");
+
+    const res = await fetch("http://localhost:8080/attendance/me/monthly-dto", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const data = await res.json().catch(() => ([]));
+    if (!res.ok) {
+      setAttendanceMonthly([]);
+      setAttendanceError((data as any)?.error ?? "Failed to fetch monthly attendance");
+      return;
+    }
+
+    setAttendanceMonthly(Array.isArray(data) ? data : []);
+  } catch {
+    setAttendanceMonthly([]);
+    setAttendanceError("Network error while fetching monthly attendance");
+  } finally {
+    setAttendanceLoading(false);
+  }
+}
+
+
   /** ✅ GET /notice */
   async function fetchNotices() {
     try {
@@ -211,9 +262,7 @@ export default function useFuncs() {
     }
   }
 
-  /** ✅ GET /marks/me/latest
-   *  If no marks exist, backend may return null (or empty).
-   */
+  /** ✅ GET /marks/me/latest */
   async function fetchLatestMarks() {
     try {
       setMarksLoading(true);
@@ -231,13 +280,47 @@ export default function useFuncs() {
         return;
       }
 
-      // backend may return null -> show "No recent tests"
       setLatestMarks(data && typeof data === "object" ? data : null);
     } catch {
       setLatestMarks(null);
       setMarksError("Network error while fetching latest marks");
     } finally {
       setMarksLoading(false);
+    }
+  }
+
+  /** ✅ GET /attendance/me/summary */
+  async function fetchAttendanceSummary() {
+    if (!token) return;
+
+    try {
+      setAttendanceLoading(true);
+      setAttendanceError("");
+
+      const res = await fetch("http://localhost:8080/attendance/me/summary", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setAttendanceSummary(null);
+        setAttendanceError((data as any)?.error ?? "Failed to fetch attendance");
+        return;
+      }
+
+      setAttendanceSummary({
+        totalDays: toNum((data as any).totalDays, 0),
+        present: toNum((data as any).present, 0),
+        absent: toNum((data as any).absent, 0),
+        late: toNum((data as any).late, 0),
+        percentage: toNum((data as any).percentage, 0),
+      });
+    } catch {
+      setAttendanceSummary(null);
+      setAttendanceError("Network error while fetching attendance");
+    } finally {
+      setAttendanceLoading(false);
     }
   }
 
@@ -272,7 +355,6 @@ export default function useFuncs() {
         throw new Error((data as any)?.error ?? "UPDATE_FAILED");
       }
 
-      // update local state immediately
       setStudent((prev) => {
         if (!prev) return prev;
         return {
@@ -299,11 +381,10 @@ export default function useFuncs() {
       class: student?.studClass ?? "-",
       email: student?.email ?? "-",
       rollNo: student?.id ?? "-",
-      admissionNo: student?.id ?? "-",
       parentName: student?.guardian ?? "-",
-      parentPhone: student?.altMobile ? String(student.altMobile) : "-",
+      parentPhone: student?.mobile ? String(student.mobile) : "-",
       address: student?.address ?? "-",
-      imageUrl: student?.imageUrl
+      imageUrl: student?.imageUrl,
     };
   }, [student]);
 
@@ -311,6 +392,27 @@ export default function useFuncs() {
   const recentTests: RecentTestRow[] = useMemo(() => {
     return toRecentTests(latestMarks);
   }, [latestMarks]);
+
+  /** ✅ Derived: Pie data */
+  const attendancePie = useMemo(() => {
+    const total = attendanceSummary?.totalDays ?? 0;
+    const present = attendanceSummary?.present ?? 0;
+    const absent = attendanceSummary?.absent ?? 0;
+    const late = attendanceSummary?.late ?? 0;
+
+    const notPresent = Math.max(0, total - present); // includes absent+late+anything else
+    // If you prefer absent+late instead:
+    // const notPresent = Math.max(0, absent + late);
+
+    return [
+      { name: "Present", value: Math.max(0, present) },
+      { name: "Not Present", value: Math.max(0, notPresent) },
+    ];
+  }, [attendanceSummary]);
+
+  const attendancePercent = useMemo(() => {
+    return attendanceSummary?.percentage ?? 0;
+  }, [attendanceSummary]);
 
   return {
     // profile
@@ -333,6 +435,14 @@ export default function useFuncs() {
     marksError,
     fetchLatestMarks,
 
+    // ✅ attendance
+    attendanceSummary,
+    attendancePie,
+    attendancePercent,
+    attendanceLoading,
+    attendanceError,
+    fetchAttendanceSummary,
+
     // update
     updateStudentMe,
     updating,
@@ -341,5 +451,7 @@ export default function useFuncs() {
 
     // utility
     getGradeColor,
+attendanceMonthly,
+fetchAttendanceMonthly
   };
 }

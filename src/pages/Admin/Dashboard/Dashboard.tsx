@@ -196,9 +196,9 @@ export default function Dashboard(props : HandleTab){
                             <Span cn='text-sm text-amber-700 text-center'>Contact</Span>
                             {isEditingInfo ? (
                                 <Input
-                                    inpTxt='Name'
+                                    inpTxt='Mobile'
                                     labelCN='hidden'
-                                    labelTxt='Name'
+                                    labelTxt='Mobile'
                                     forName='name'
                                     type='text'
                                     inpCN="text-xs text-amber-800 bg-white border rounded px-2 py-1 w-full"
@@ -222,7 +222,7 @@ export default function Dashboard(props : HandleTab){
                                     forName='Experience'
                                     type='text'
                                     inpCN="text-xs text-amber-800 bg-white border rounded px-2 py-1 w-full"
-                                    value={`${editForm.exp}`}
+                                    value={`${editForm.exp === 0 ? "" : editForm.exp}`}
                                     onChange={(e) => {
                                         const val = parseInt(e.target.value) > 50 ? 50 : parseInt(e.target.value) < 0 ? 0 : parseInt(e.target.value);
                                         setEditForm((p) => ({ ...p, exp: val }))
@@ -270,27 +270,27 @@ export default function Dashboard(props : HandleTab){
                         </Div>
                     </Div>
                     {isImageModalOpen && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center">
+  <Div cn="fixed inset-0 z-50 flex items-center justify-center">
     {/* overlay */}
-    <div
-      className="absolute inset-0 bg-black/40"
+    <Div
+      cn="absolute inset-0 bg-black/40"
       onClick={closeImageModal}
     />
 
     {/* modal */}
-    <div className="relative z-10 w-[92%] max-w-md rounded-xl bg-white p-5 shadow-lg">
-      <div className="flex items-center justify-between">
+    <Div cn="relative z-10 w-[92%] max-w-md rounded-xl bg-white p-5 shadow-lg">
+      <Div cn="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-amber-900">Update Profile Image</h3>
-        <button
-          className="text-gray-500 hover:text-gray-800"
+        <Button
+          cn="text-gray-500 hover:text-gray-800"
           onClick={closeImageModal}
           type="button"
         >
           ✕
-        </button>
-      </div>
+        </Button>
+      </Div>
 
-      <div className="mt-4">
+      <Div cn="mt-4">
         <input
           id="profile-image"
           type="file"
@@ -306,9 +306,9 @@ export default function Dashboard(props : HandleTab){
           Choose Image
         </label>
 
-        <div className="mt-2 text-sm text-gray-700">
+        <Div cn="mt-2 text-sm text-gray-700">
           {selectedImage ? selectedImage.name : "No file selected"}
-        </div>
+        </Div>
 
         {selectedImage && (
           <img
@@ -318,19 +318,19 @@ export default function Dashboard(props : HandleTab){
             onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
           />
         )}
-      </div>
+      </Div>
 
-      <div className="mt-6 flex justify-end gap-2">
-        <button
-          className="rounded bg-gray-200 px-4 py-2 text-amber-900 hover:bg-gray-300"
+      <Div cn="mt-6 flex justify-end gap-2">
+        <Button
+          cn="rounded bg-gray-200 px-4 py-2 text-amber-900 hover:bg-gray-300"
           onClick={closeImageModal}
           type="button"
         >
           Cancel
-        </button>
+        </Button>
 
-        <button
-          className="rounded bg-teal-500 px-4 py-2 text-white hover:bg-teal-600 disabled:bg-gray-400"
+        <Button
+          cn="rounded bg-teal-500 px-4 py-2 text-white hover:bg-teal-600 disabled:bg-gray-400"
           type="button"
           disabled={!selectedImage}
           onClick={async () => {
@@ -343,10 +343,10 @@ export default function Dashboard(props : HandleTab){
           }}
         >
           Upload
-        </button>
-      </div>
-    </div>
-  </div>
+        </Button>
+      </Div>
+    </Div>
+  </Div>
 )}
 
                 </Div>

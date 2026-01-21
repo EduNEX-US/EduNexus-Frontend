@@ -30,7 +30,7 @@ const [editForm, setEditForm] = useState({
   name: adminDetails?.name ?? "",
   email: adminDetails?.email ?? "",
   mobile: adminDetails?.mobile ?? "",
-  exp: adminDetails?.exp ?? 0,
+  exp: adminDetails?.exp ?? "",
   qualification: adminDetails?.qualification ?? "",
   address: adminDetails?.address ?? "",
 });

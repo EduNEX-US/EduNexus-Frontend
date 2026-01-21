@@ -4,14 +4,13 @@ import Sidebar from '../Sidebar/Sidebar';
 import Marks from '../Marks/Marks';
 import Ptm from '../PTM/Ptm';
 import Lost_Found from '../Lost&Found/Lost_Found';
-import Notification from '../Notifications/Notifications';
+// import Notification from '../Notifications/Notifications';
 import useStudentView from './Functionality';
 
 export default function Student_View(){
     const {activeTab, handleActiveTab, handleBarsVisibility, barsVisibility} = useStudentView();
     return <Section cn='w-full h-lvh flex md:flex-row flex-col overflow-x-hidden'>
         <Sidebar handleFunc={handleActiveTab} activeTab={activeTab} handleBarsVisibility={handleBarsVisibility} barsVisibility={barsVisibility} />
-        {/* <Notification handleActiveTab={handleActiveTab}/> */}
         { activeTab === "dashboard" && <Dashboard handleFunc={handleActiveTab} /> }
         { activeTab === "marks" && <Marks /> }
         { activeTab === "lost&found" && <Lost_Found /> }

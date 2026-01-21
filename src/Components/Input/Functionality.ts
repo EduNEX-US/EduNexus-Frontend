@@ -11,5 +11,6 @@ export interface InputProps{
     inpCN : string,
     value? : string,
     disabled? : boolean,
-    accept? : string
+    accept? : string,
+    min? : any
 }

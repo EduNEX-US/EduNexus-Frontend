@@ -26,17 +26,17 @@ export default function Register_Users(){
     tDispatch({ type: "tMob", payload: digits === "" ? 0 : Number(digits) });
   }
                     } forName='tMobile' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
-                  <Input inpTxt="Classes (comma separated)" labelCN='hidden' value={`${teacherForm.tClass}`} labelTxt='Class' type='number' onChange={
+                  <Input inpTxt="Class" labelCN='hidden' value={`${teacherForm.tClass}`} labelTxt='Class' type='number' onChange={
                     (e) => {
                       const val = parseInt(e.target.value) > 12 ? 12 : parseInt(e.target.value) < 0 ? 1 : parseInt(e.target.value);
                       tDispatch({type : "tClass", payload : val})}} forName='tClass' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
-                  <Input inpTxt="Experience (years)" labelCN='hidden' value={`${teacherForm.exp}`} labelTxt='Class' type='number' onChange={
+                  <Input inpTxt="Experience (years)" labelCN='hidden' value={`${teacherForm.exp === 0 ? "" : teacherForm.exp}`} labelTxt='Class' type='number' onChange={
                     (e) => {
                       const val = parseInt(e.target.value) > 50 ? 50 : parseInt(e.target.value) < 0 ? 0 : parseInt(e.target.value);
                       tDispatch({type : "exp", payload : val})}} forName='experience' inpCN="p-1 text-sm lg:text-lg md:p-3 border rounded" />
                       <Div cn="p-1 border rounded flex items-center gap-3 bg-white">
                         <input
-                          id="lost-image"
+                          id="image"
                           type="file"
                           accept="image/*"
                           className="hidden"
@@ -44,7 +44,7 @@ export default function Register_Users(){
                         />
                       
                         <label
-                          htmlFor="lost-image"
+                          htmlFor="image"
                           className="px-4 py-2 rounded bg-teal-500 text-white cursor-pointer hover:bg-teal-600 whitespace-nowrap"
                         >
                           Upload Image
@@ -76,7 +76,7 @@ export default function Register_Users(){
               <Button cn="mt-3 md:mt-6 bg-teal-500 text-white px-4 md:px-6 lg:text-lg text-sm md:ml-8 cursor-pointer py-2 rounded hover:bg-teal-600"
   onClick={() => handleShowCsvModal(true)}
 >
-  Import Teachers (CSV)
+  Upload Teachers (CSV)
 </Button>
 
           </Div>

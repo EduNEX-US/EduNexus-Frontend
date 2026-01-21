@@ -72,17 +72,10 @@ type ExportRow = {
   id: string;
   name: string;
   role: "teacher" | "admin";
-  password: string; // always default like Welcom@123
+  password: string;
 };
 
-
 export default function useFuncs(){
-    // const [studentForm, sDispatch] = useReducer(reducer, initialStudents);
-    const [importError, setImportError] = useState<string>("");
-const [importRows, setImportRows] = useState<TeacherForm[]>([]);
-const [importing, setImporting] = useState<boolean>(false);
-
-
     const [showCsvModal, setShowCsvModal] = useState(false);
     const [csvFile, setCsvFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);

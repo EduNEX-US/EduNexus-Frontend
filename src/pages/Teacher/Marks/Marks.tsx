@@ -1,5 +1,4 @@
-// ========================= ManageMarks.tsx (COPY-PASTE WHOLE) =========================
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Section, Div, Span, Button, Input } from "../../../Components/Assembler";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faFileCsv, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -55,6 +54,20 @@ export default function ManageMarks() {
     if (profile?.tClass) fetchMarksForTeacher();
   }, [examSession, profile?.tClass]);
 
+  // ✅ SEARCH STATE + FILTER
+  const [search, setSearch] = useState("");
+
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return teacherRows;
+
+    return teacherRows.filter((row: any) => {
+      const name = String(getStudentName(row) ?? "").toLowerCase();
+      const id = String(getStudentId(row) ?? "").toLowerCase();
+      return name.includes(q) || id.includes(q);
+    });
+  }, [teacherRows, search, getStudentName, getStudentId]);
+
   return (
     <Section cn="w-full min-h-screen bg-[#FFF8EE] p-6 overflow-y-auto">
       {/* ===== HEADER ===== */}
@@ -98,14 +111,17 @@ export default function ManageMarks() {
             icon={faSearch}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"
           />
+
+          {/* ✅ WORKING SEARCH INPUT */}
           <Input
             labelCN="hidden"
             labelTxt="Search"
             forName="search"
-            onChange={() => {}}
             type="text"
             inpTxt="Search for student..."
             inpCN="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-amber-200/40 shadow-sm focus:ring-2 focus:ring-amber-300 outline-none"
+            value={search}
+            onChange={(e) => setSearch((e.target as HTMLInputElement).value)}
           />
         </Div>
 
@@ -139,11 +155,11 @@ export default function ManageMarks() {
 
         {loadingRows ? (
           <Div cn="p-10 text-center text-amber-700">Loading...</Div>
-        ) : teacherRows.length === 0 ? (
+        ) : filteredRows.length === 0 ? (
           <Div cn="p-10 text-center text-amber-600 opacity-70">No records found</Div>
         ) : (
           <Div cn="divide-y divide-amber-200/40">
-            {teacherRows.map((row) => (
+            {filteredRows.map((row: any) => (
               <Div
                 key={row.id}
                 cn="grid grid-cols-9 px-4 py-3 text-sm text-[#5a3a00] bg-white/60 items-center"
@@ -155,7 +171,9 @@ export default function ManageMarks() {
                 <Span cn="">{row.hindi ?? "-"}</Span>
                 <Span cn="">{row.math ?? "-"}</Span>
                 <Span cn="">{row.science ?? "-"}</Span>
-                <Span cn="">{usesGK ? (row.generalKnowledge ?? "-") : (row.socialScience ?? "-")}</Span>
+                <Span cn="">
+                  {usesGK ? (row.generalKnowledge ?? "-") : (row.socialScience ?? "-")}
+                </Span>
                 <Span cn="">{row.computer ?? "-"}</Span>
 
                 <Div cn="flex justify-end gap-2">
@@ -191,23 +209,24 @@ export default function ManageMarks() {
             <Div cn="flex justify-between items-center mb-6">
               <Div cn="flex items-center gap-3">
                 <Span cn="text-xl font-bold text-[#7A4A00]">
-                  {editingId ? "Edit Marks" : "Upload Marks Manually" }
+                  {editingId ? "Edit Marks" : "Upload Marks Manually"}
                 </Span>
 
                 {/* ✅ Exam Session Select (Manual) */}
-                {!editingId && <select
-                  value={examSession}
-                  onChange={(e) => handleExamSession(e.target.value as any)}
-                  className="bg-orange-400 px-2 py-1 font-semibold text-orange-50 rounded outline-none"
-                >
-                  {examSessionOptions.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>}
+                {!editingId && (
+                  <select
+                    value={examSession}
+                    onChange={(e) => handleExamSession(e.target.value as any)}
+                    className="bg-orange-400 px-2 py-1 font-semibold text-orange-50 rounded outline-none"
+                  >
+                    {examSessionOptions.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </Div>
-              
 
               <FontAwesomeIcon
                 icon={faXmark}
@@ -227,7 +246,7 @@ export default function ManageMarks() {
                   editingId ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 value={state.studentId}
-                onChange={(e) => dispatch({ type: "studentId", payload: e.target.value })}
+                onChange={(e) => dispatch({ type: "studentId", payload: (e.target as HTMLInputElement).value })}
               />
 
               <Input
@@ -239,7 +258,7 @@ export default function ManageMarks() {
                 inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                 value={`${state.english}`}
                 onChange={(e) => {
-                  const raw = e.target.value;
+                  const raw = (e.target as HTMLInputElement).value;
                   if (raw === "") return dispatch({ type: "english", payload: "" });
                   const val = Math.min(100, Math.max(0, Number(raw)));
                   dispatch({ type: "english", payload: `${val}` });
@@ -255,7 +274,7 @@ export default function ManageMarks() {
                 inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                 value={`${state.hindi}`}
                 onChange={(e) => {
-                  const raw = e.target.value;
+                  const raw = (e.target as HTMLInputElement).value;
                   if (raw === "") return dispatch({ type: "hindi", payload: "" });
                   const val = Math.min(100, Math.max(0, Number(raw)));
                   dispatch({ type: "hindi", payload: `${val}` });
@@ -271,7 +290,7 @@ export default function ManageMarks() {
                 inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                 value={`${state.math}`}
                 onChange={(e) => {
-                  const raw = e.target.value;
+                  const raw = (e.target as HTMLInputElement).value;
                   if (raw === "") return dispatch({ type: "math", payload: "" });
                   const val = Math.min(100, Math.max(0, Number(raw)));
                   dispatch({ type: "math", payload: `${val}` });
@@ -287,7 +306,7 @@ export default function ManageMarks() {
                 inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                 value={`${state.science}`}
                 onChange={(e) => {
-                  const raw = e.target.value;
+                  const raw = (e.target as HTMLInputElement).value;
                   if (raw === "") return dispatch({ type: "science", payload: "" });
                   const val = Math.min(100, Math.max(0, Number(raw)));
                   dispatch({ type: "science", payload: `${val}` });
@@ -304,7 +323,7 @@ export default function ManageMarks() {
                   inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                   value={`${state.socialScience}`}
                   onChange={(e) => {
-                    const raw = e.target.value;
+                    const raw = (e.target as HTMLInputElement).value;
                     if (raw === "") return dispatch({ type: "socialScience", payload: "" });
                     const val = Math.min(100, Math.max(0, Number(raw)));
                     dispatch({ type: "socialScience", payload: `${val}` });
@@ -320,7 +339,7 @@ export default function ManageMarks() {
                   inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                   value={`${state.generalKnowledge}`}
                   onChange={(e) => {
-                    const raw = e.target.value;
+                    const raw = (e.target as HTMLInputElement).value;
                     if (raw === "") return dispatch({ type: "generalKnowledge", payload: "" });
                     const val = Math.min(100, Math.max(0, Number(raw)));
                     dispatch({ type: "generalKnowledge", payload: `${val}` });
@@ -336,7 +355,7 @@ export default function ManageMarks() {
                 value={`${state.computer}`}
                 type="number"
                 onChange={(e) => {
-                  const raw = e.target.value;
+                  const raw = (e.target as HTMLInputElement).value;
                   if (raw === "") return dispatch({ type: "computer", payload: "" });
                   const val = Math.min(100, Math.max(0, Number(raw)));
                   dispatch({ type: "computer", payload: `${val}` });
@@ -347,7 +366,7 @@ export default function ManageMarks() {
               <input
                 type="date"
                 value={resultDate}
-                onChange={(e) => handleResultDate(e.target.value.split("T")[0])}
+                onChange={(e) => handleResultDate((e.target as HTMLInputElement).value.split("T")[0])}
                 className="px-4 py-3 rounded-lg border border-amber-200/40"
               />
 
@@ -389,7 +408,7 @@ export default function ManageMarks() {
                 <input
                   type="date"
                   value={resultDate}
-                  onChange={(e) => handleResultDate(e.target.value)}
+                  onChange={(e) => handleResultDate((e.target as HTMLInputElement).value)}
                   className="border px-2 py-1 rounded"
                 />
                 <FontAwesomeIcon
@@ -417,7 +436,7 @@ export default function ManageMarks() {
                 accept=".csv"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
+                  const file = (e.target as HTMLInputElement).files?.[0];
                   if (!file) return;
 
                   if (file.type !== "text/csv" && !file.name.toLowerCase().endsWith(".csv")) {
