@@ -1,135 +1,435 @@
-import { useEffect, useState } from "react";
+// ===================== Functionality.ts (Admin PTM Hook) =====================
+import { useEffect, useMemo, useState } from "react";
+import { useAppSelector } from "../../../hooks/useAppSelector";
 
-type students = { id : number, name : string};
-type ptms = {id : number, sClass : string, student : string, teacher : string, date : string, time : string};
-export default function useFuncs(){
-    const colorPrimary = "oklch(71.4% 0.203 305.504)";
+type Teacher = { id: string; name: string };
 
-  const [selectedClass, setSelectedClass] = useState("");
-  const [students, setStudents] = useState<students[]>([]); // students available for scheduling
-  const [teachers, setTeachers] = useState<string[]>([]);
+type PtmSession = {
+  id: string; // ✅ force string id (no null issues)
 
-  // Completed PTMs only (attended)
-  const [completedPTMs, setCompletedPTMs] = useState<ptms[]>([
-    // initial sample data
-    { id: 1, sClass: "1A", student: "Riya Sharma", teacher: "Ms. Kapoor", date: "2024-01-10", time: "11:00" }
-  ]);
-  const [filterClass, setFilterClass] = useState<string>("");
+  ptmScope?: string;  // "ONE_TO_ONE" | "ALL"
+  ptmTarget?: string; // "ADMIN"
+  adminId?: string;
+  teacherId?: string | null;
 
-  // form fields
-  const [selectedStudent, setSelectedStudent] = useState("");
-  const [selectedTeacher, setSelectedTeacher] = useState("");
-  const [selectedTime, setSelectedTime] = useState<string>("");
+  meetLink?: string;
+  purpose?: string;
+
+  ptmDate?: string;   // "YYYY-MM-DD" or ISO
+  startTime?: string; // "HH:mm" or "HH:mm:ss"
+  endTime?: string;   // "HH:mm" or "HH:mm:ss"
+  status?: string;
+};
+
+const API_BASE = "http://localhost:8080";
+
+function toYYYYMMDD(d: any) {
+  if (!d) return "";
+  const s = String(d).trim();
+  return s.length >= 10 ? s.slice(0, 10) : s;
+}
+
+function toHHmm(t: any) {
+  if (!t) return "";
+  const s = String(t).trim();
+  const parts = s.split(":");
+  return parts.length >= 2 ? `${parts[0]}:${parts[1]}` : s;
+}
+
+function norm(s: any) {
+  return String(s ?? "").trim();
+}
+
+function isValidMeetLink(url: string) {
+  return /^https?:\/\/.+/i.test(String(url || "").trim());
+}
+
+// ✅ if backend sends id = null, create a stable synthetic id
+function fallbackId(p: any) {
+  return [
+    "PTM",
+    norm(p?.adminId),
+    norm(p?.teacherId),
+    norm(p?.ptmScope),
+    norm(p?.ptmTarget),
+    toYYYYMMDD(p?.ptmDate),
+    toHHmm(p?.startTime),
+    toHHmm(p?.endTime),
+    norm(p?.meetLink),
+  ].join("|");
+}
+
+// ✅ key to match ALL master vs generated 1:1 children
+function meetingKey(p: PtmSession) {
+  return [
+    norm(p.adminId),
+    toYYYYMMDD(p.ptmDate),
+    toHHmm(p.startTime),
+    toHHmm(p.endTime),
+    norm(p.meetLink),
+    norm(p.purpose),
+  ].join("|");
+}
+
+export default function useFuncs() {
+  const token = useAppSelector((state) => state.auth.token);
+  const adminId = useAppSelector((state) => state.auth.id);
+
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loadingTeachers, setLoadingTeachers] = useState(false);
+
+  const [rawPTMs, setRawPTMs] = useState<PtmSession[]>([]);
+  const [loadingPTMs, setLoadingPTMs] = useState(false);
+
+  const [scheduleMode, setScheduleMode] = useState<"SINGLE" | "ALL">("SINGLE");
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
+
+  const [meetLink, setMeetLink] = useState<string>("");
+  const [purpose, setPurpose] = useState<string>("");
+
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
 
-  const classes = ["1A", "1B", "2A", "2B", "3A"];
-  // useEffect(()=>{
-  //   fetchClassData();
-  // },[]);
-  // simulate backend fetch for a class
-  async function fetchClassData ( val : string) {
-    // In reality you'd call an API here. We return dummy data per class.
-    const dummyStudents : students[] = [
-      { id: 1, name: "Aman Kumar" },
-      { id: 2, name: "Riya Sharma" },
-      { id: 3, name: "Vivek Singh" }
-    ];
+  const [filterTeacherId, setFilterTeacherId] = useState<string>("");
 
-    const dummyTeachers : string[] = ["Mr. Verma", "Ms. Kapoor"];
-    try{
-      const res = await fetch("http://localhost:8080/ptm/get");
-      const data = await res.json();
-      setStudents(data.data);
-    }
-    catch{
-      console.log("Error Occurred while fetching");
-    }
-    setStudents(dummyStudents);
-    setTeachers(dummyTeachers);
+  useEffect(() => {
+    if (!token || !adminId) return;
+    fetchTeachers();
+    fetchAdminPTMs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, adminId]);
 
-    // reset the scheduling form
-    setSelectedStudent("");
-    setSelectedTeacher("");
-    setSelectedTime("");
-    setSelectedDate("");
-  };
+  async function fetchTeachers() {
+    try {
+      if (!token) return;
+      setLoadingTeachers(true);
 
-  // Schedule PTM: this schedules (removes student from the scheduling list) but does NOT add to completedPTMs
-  async function handleSchedule(){
-    if (!selectedClass || !selectedStudent || !selectedTeacher || !selectedTime || !selectedDate) return;
-
-    // In production you'd POST to an API which stores scheduled PTMs. Here we just log.
-    console.log("Scheduled PTM (not completed):", {
-      class: selectedClass,
-      student: selectedStudent,
-      teacher: selectedTeacher,
-      date: selectedDate,
-      time: selectedTime,
-    });
-
-    const newPTM = {
-      sClass: selectedClass,
-      student: selectedStudent,
-      teacher: selectedTeacher,
-      date: selectedDate,
-      time: selectedTime,
-    };
-
-    try{
-      const res = await fetch("http://localhost:8080/ptm", {
-        headers : {
-          "Content-Type" : "application/json"
-        },
-        method : "POST",
-        body : JSON.stringify(newPTM)
+      const res = await fetch(`${API_BASE}/admin/teachers`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if(res.ok){
+      if (!res.ok) {
+        console.log("fetchTeachers failed:", res.status);
+        setTeachers([]);
+        return;
+      }
 
+      const data = await res.json();
+      const list: Teacher[] = (Array.isArray(data) ? data : [])
+        .filter((d: any) => d?.role === 0)
+        .map((d: any) => ({ id: String(d.id), name: String(d.name) }));
+
+      setTeachers(list);
+    } catch (e) {
+      console.log("Error occurred while fetching teachers", e);
+      setTeachers([]);
+    } finally {
+      setLoadingTeachers(false);
+    }
+  }
+
+  async function fetchAdminPTMs() {
+    try {
+      if (!token || !adminId) return;
+      setLoadingPTMs(true);
+
+      const res = await fetch(`${API_BASE}/api/ptm/admin/${encodeURIComponent(String(adminId))}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        console.log("fetchAdminPTMs failed:", res.status, txt);
+        setRawPTMs([]);
+        return;
+      }
+
+      const data = await res.json();
+      const list: any[] = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+
+      // ✅ normalize everything first (NO strict ptmTarget filter that can drop completed)
+      const normalized: PtmSession[] = list.map((p: any) => {
+        const idRaw = p?.id ?? p?.ptmId ?? p?.sessionId ?? null;
+        const id = idRaw != null && String(idRaw).trim() !== "" ? String(idRaw) : fallbackId(p);
+
+        const scope = norm(p?.ptmScope).toUpperCase();
+        const target = norm(p?.ptmTarget).toUpperCase();
+
+        return {
+          id,
+
+          ptmScope: scope || undefined,
+          ptmTarget: target || "ADMIN", // ✅ fallback
+
+          adminId: norm(p?.adminId || adminId) || String(adminId),
+          teacherId: p?.teacherId != null && norm(p.teacherId) !== "" ? String(p.teacherId) : null,
+
+          meetLink: norm(p?.meetLink),
+          purpose: norm(p?.purpose),
+
+          ptmDate: toYYYYMMDD(p?.ptmDate),
+          startTime: toHHmm(p?.startTime),
+          endTime: toHHmm(p?.endTime),
+
+          status: norm(p?.status),
+        };
+      });
+
+      // ✅ Keep only admin-side meetings safely
+      const adminMeetings = normalized.filter((p) => (p.ptmTarget || "ADMIN").toUpperCase() === "ADMIN");
+
+      // ✅ If backend still creates ONE_TO_ONE children for ALL, hide those duplicates:
+      // Build set of ALL master keys
+      const allMasters = adminMeetings.filter((p) => (p.ptmScope || "").toUpperCase() === "ALL");
+      const allKeys = new Set(allMasters.map(meetingKey));
+
+      // Hide ONE_TO_ONE rows that match ANY ALL master key (same date/time/link/purpose/adminId)
+      // But keep true ONE_TO_ONE that doesn't match an ALL master.
+      const cleaned = adminMeetings.filter((p) => {
+        const scope = (p.ptmScope || "").toUpperCase();
+
+        if (scope === "ALL") return true;
+
+        if (scope === "ONE_TO_ONE") {
+          const k = meetingKey(p);
+          // if it matches an ALL master, it's a generated child -> hide
+          if (allKeys.has(k)) return false;
+          return true;
+        }
+
+        // unknown scopes: keep (safer)
+        return true;
+      });
+
+      // ✅ sort by date/time ascending so UI classification behaves nicely
+      cleaned.sort((a, b) => {
+        const aKey = `${a.ptmDate || ""} ${a.startTime || ""}`;
+        const bKey = `${b.ptmDate || ""} ${b.startTime || ""}`;
+        return aKey.localeCompare(bKey);
+      });
+
+      setRawPTMs(cleaned);
+    } catch (e) {
+      console.log("Error occurred while fetching admin PTMs", e);
+      setRawPTMs([]);
+    } finally {
+      setLoadingPTMs(false);
+    }
+  }
+
+  function resetForm() {
+    setSelectedTeacherId("");
+    setMeetLink("");
+    setPurpose("");
+    setSelectedDate("");
+    setStartTime("");
+    setEndTime("");
+  }
+
+  function validate(): string | null {
+    if (!token) return "No token found";
+    if (!adminId) return "Admin ID missing";
+    if (!purpose.trim()) return "Enter PTM purpose";
+    if (!selectedDate) return "Select date";
+    if (!startTime) return "Select start time";
+    if (!endTime) return "Select end time";
+    if (!meetLink || !isValidMeetLink(meetLink)) return "Enter a valid Meet link";
+
+    if (scheduleMode === "SINGLE" && !selectedTeacherId) return "Select a teacher";
+    if (scheduleMode === "ALL" && teachers.length === 0) return "No teachers available";
+    return null;
+  }
+
+async function handleSchedule() {
+  const err = validate();
+  if (err) {
+    alert(err);
+    return;
+  }
+
+  try {
+    // ---------------- SINGLE ----------------
+    if (scheduleMode === "SINGLE") {
+      const payload = {
+        ptmScope: "ONE_TO_ONE",
+        ptmTarget: "ADMIN",
+        adminId: String(adminId),
+        teacherId: String(selectedTeacherId),
+        meetLink: meetLink.trim(),
+        purpose: purpose.trim(),
+        ptmDate: selectedDate,
+        startTime: toHHmm(startTime),
+        endTime: toHHmm(endTime),
+        status: "SCHEDULED",
+      };
+
+      const res = await fetch(`${API_BASE}/api/ptm/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        console.log("PTM create failed:", res.status, txt);
+        alert("Failed to schedule PTM");
+        return;
+      }
+
+      await fetchAdminPTMs();
+      resetForm();
+      alert("PTM scheduled for teacher");
+      return;
+    }
+
+    // ---------------- ALL (MASTER + CHILDREN) ----------------
+    // ✅ 1) Create master ALL row (admin sees only this)
+    const masterPayload: any = {
+      ptmScope: "ALL",
+      ptmTarget: "ADMIN",
+      adminId: String(adminId),
+      // teacherId intentionally not set
+      meetLink: meetLink.trim(),
+      purpose: purpose.trim(),
+      ptmDate: selectedDate,
+      startTime: toHHmm(startTime),
+      endTime: toHHmm(endTime),
+      status: "SCHEDULED",
+    };
+
+    const masterRes = await fetch(`${API_BASE}/api/ptm/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(masterPayload),
+    });
+
+    if (!masterRes.ok) {
+      const txt = await masterRes.text().catch(() => "");
+      console.log("ALL master create failed:", masterRes.status, txt);
+      alert("Failed to schedule (ALL master)");
+      return;
+    }
+
+    // ✅ 2) Create ONE_TO_ONE child row per teacher (teachers can fetch + join)
+    // (Admin UI will hide these automatically because they match master meetingKey)
+    for (const t of teachers) {
+      const childPayload: any = {
+        ptmScope: "ONE_TO_ONE",
+        ptmTarget: "ADMIN",
+        adminId: String(adminId),
+        teacherId: String(t.id),
+        meetLink: meetLink.trim(), // later you can make this unique per teacher if needed
+        purpose: purpose.trim(),
+        ptmDate: selectedDate,
+        startTime: toHHmm(startTime),
+        endTime: toHHmm(endTime),
+        status: "SCHEDULED",
+      };
+
+      const childRes = await fetch(`${API_BASE}/api/ptm/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(childPayload),
+      });
+
+      if (!childRes.ok) {
+        const txt = await childRes.text().catch(() => "");
+        console.log("ALL child create failed for teacher:", t.id, childRes.status, txt);
+        alert(`Failed while scheduling for teacher ${t.name}`);
+        return;
       }
     }
-    catch{
-      console.log("Error occurred in PTM Scheduling");
-    }
-    // Remove the student so they can't be scheduled again
-    setStudents(prev => prev.filter(s => s.name !== selectedStudent));
 
-    // clear form so admin can schedule another
-    setSelectedStudent("");
-    setSelectedTeacher("");
-    setSelectedTime("");
-    setSelectedDate("");
-  };
-
-  // Add a completed PTM (mark attended) — admin can add this when a meeting was attended
-  const addCompletedPTM = ({ id, sClass, student, teacher, date, time } : ptms) => {
-    if (!sClass || !student || !teacher || !date || !time) return;
-    const newEntry = { id: Date.now(), sClass: sClass, student, teacher, date, time };
-    setCompletedPTMs(prev => [newEntry, ...prev]);
-  };
-
-  function handleSelectedClass(val : string){
-    setSelectedClass(val);
+    await fetchAdminPTMs();
+    resetForm();
+    alert("PTM scheduled for all teachers");
+  } catch (e) {
+    console.log("Error occurred in PTM scheduling", e);
+    alert("Error occurred in PTM scheduling");
   }
+}
 
-  function handleSelectedStudent(val : string){
-    setSelectedStudent(val);
+
+  // ✅ filter by teacher:
+  // - keep ALL master always
+  // - keep ONE_TO_ONE when teacher matches
+  const scheduledPTMs = useMemo(() => {
+    if (!filterTeacherId) return rawPTMs;
+
+    return rawPTMs.filter((p) => {
+      const scope = (p.ptmScope || "").toUpperCase();
+      if (scope === "ALL") return true;
+      return String(p.teacherId || "") === String(filterTeacherId);
+    });
+  }, [rawPTMs, filterTeacherId]);
+
+  function handleScheduleMode(val: "SINGLE" | "ALL") {
+    setScheduleMode(val);
+    if (val === "ALL") setSelectedTeacherId("");
   }
-
-  function handleSelectedTeacher(val : string){
-    setSelectedTeacher(val);
+  function handleSelectedTeacher(val: string) {
+    setSelectedTeacherId(val);
   }
-
-  function handleSelectedDate(val : string){
+  function handleMeetLink(val: string) {
+    setMeetLink(val);
+  }
+  function handlePurpose(val: string) {
+    setPurpose(val);
+  }
+  function handleSelectedDate(val: string) {
     setSelectedDate(val);
   }
-
-  function handleSelectedTime(val : string){
-    setSelectedTime(val);
+  function handleStartTime(val: string) {
+    setStartTime(val);
+  }
+  function handleEndTime(val: string) {
+    setEndTime(val);
+  }
+  function handleFilterTeacher(val: string) {
+    setFilterTeacherId(val);
   }
 
-  function handleFilterClass(val : string){
-    setFilterClass(val);
-  }
-  return {colorPrimary, selectedClass, students, teachers, completedPTMs, selectedStudent, selectedTeacher , classes, filterClass, selectedDate, selectedTime, setStudents, handleFilterClass, handleSelectedClass, handleSelectedDate, handleSelectedTime, handleSelectedTeacher, handleSelectedStudent, addCompletedPTM, handleSchedule, fetchClassData};
+  return {
+    adminId,
+
+    teachers,
+    loadingTeachers,
+
+    scheduledPTMs,
+    loadingPTMs,
+
+    scheduleMode,
+    selectedTeacherId,
+    meetLink,
+    purpose,
+    selectedDate,
+    startTime,
+    endTime,
+
+    filterTeacherId,
+
+    fetchTeachers,
+    fetchAdminPTMs,
+
+    handleScheduleMode,
+    handleSelectedTeacher,
+    handleMeetLink,
+    handlePurpose,
+    handleSelectedDate,
+    handleStartTime,
+    handleEndTime,
+
+    handleFilterTeacher,
+    handleSchedule,
+  };
 }

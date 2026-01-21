@@ -42,6 +42,7 @@ export default function Dashboard(props: HandleTab) {
     approveClaim,
     rejectClaim,
     actingClaimId,
+    isValidEmail
   } = useFuncs();
 
   // ---------- Safe values ----------
@@ -112,6 +113,16 @@ export default function Dashboard(props: HandleTab) {
 
   async function handleSave() {
     try {
+      if(form.mobile.trim().length < 10){
+        alert("Mobile Number is Invalid");
+        return;
+      }
+
+      const emailValue = form.email.trim();
+    if (!isValidEmail(emailValue)) {
+      alert("Please enter a valid email (example: name@gmail.com)");
+      return;
+    }
       setSaving(true);
 
       const payload = {
@@ -464,7 +475,9 @@ export default function Dashboard(props: HandleTab) {
                 inpTxt="Mobile"
                 inpCN="px-4 py-3 rounded-lg border border-amber-200/40 focus:ring-2 focus:ring-amber-300 outline-none"
                 value={form.mobile}
-                onChange={(e) => setForm((p) => ({ ...p, mobile: e.target.value }))}
+                onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  setForm((p) => ({ ...p, mobile: digits}))}}
               />
 
               <Input

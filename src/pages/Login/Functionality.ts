@@ -1,3 +1,4 @@
+// ======================= Functionality.ts (HOOK FILE) =======================
 import { useRef, useState } from "react";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { hydrateAuth } from "../../features/auth/authThunk";
@@ -15,6 +16,16 @@ export default function useFuncs() {
   const [error, setError] = useState("");
 
   const dispatch = useAppDispatch();
+
+  // ✅ password toggle state
+  const [showPass, setShowPass] = useState(false);
+  const passType = showPass ? "text" : "password";
+
+  function handlePassType(e?: React.MouseEvent<HTMLButtonElement>) {
+    e?.preventDefault();
+    setShowPass((p) => !p);
+    requestAnimationFrame(() => passRef.current?.focus());
+  }
 
   async function loginUser() {
     try {
@@ -46,10 +57,6 @@ export default function useFuncs() {
         navigate("/change-password");
         return;
       }
-      else{
-        console.log(result);
-        console.log("It ccame false");
-      }
 
       // 4) route by role
       if (result.role === "admin") navigate("/edu-admin");
@@ -68,5 +75,17 @@ export default function useFuncs() {
     setRole(e.target.value as Role);
   }
 
-  return { idRef, passRef, role, handleRole, handleLogin, error };
+  return {
+    idRef,
+    passRef,
+    role,
+    handleRole,
+    handleLogin,
+    error,
+
+    // ✅ expose toggle pieces
+    passType,
+    showPass,
+    handlePassType,
+  };
 }

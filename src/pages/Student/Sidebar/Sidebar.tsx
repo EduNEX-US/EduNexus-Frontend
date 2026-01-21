@@ -39,7 +39,7 @@ export default function Sidebar(props: HandleTab) {
                   </Button>
                   <Button cn={` w-full group h-[10%] text-xl ${activeTab === "marks" ? "bg-orange-400 text-orange-50" : "hover:bg-orange-400 hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-orange-50"}  transition transition-all duration-400 ease cursor-pointer`} onClick={()=> handleFunc!("marks")}>
                       <Span cn={`text-sm rounded size-full flex items-center justify-center lg:text-xl block`}>
-                          <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>
+                          <FontAwesomeIcon icon={faBookOpen}></FontAwesomeIcon>
                       </Span>
                   </Button>
                   <Button cn={` w-full group h-[10%] text-xl ${activeTab === "lost&found" ? "bg-orange-400 text-orange-50" : "hover:bg-orange-400 hover:border-b-2 hover:shadow-lg hover:shadow-black hover:text-orange-50"}  transition transition-all duration-400 ease cursor-pointer`} onClick={()=> handleFunc!("lost&found")}>

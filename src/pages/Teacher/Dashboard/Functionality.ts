@@ -285,6 +285,45 @@ export default function useFuncs() {
     }
   }
 
+  // ✅ Email validation (RFC-ish, practical)
+function isValidEmail(raw: string) {
+  const email = raw.trim();
+
+  // basic shape + no spaces
+  if (!email || email.length > 254 || /\s/.test(email)) return false;
+
+  const parts = email.split("@");
+  if (parts.length !== 2) return false;
+
+  const [local, domain] = parts;
+  if (!local || !domain) return false;
+
+  // local-part rules (practical)
+  if (local.length > 64) return false;
+  if (local.startsWith(".") || local.endsWith(".") || local.includes("..")) return false;
+
+  // domain rules
+  if (domain.length > 253) return false;
+  if (!domain.includes(".")) return false; // require TLD
+  if (domain.startsWith("-") || domain.endsWith("-")) return false;
+
+  // allowed chars checks
+  const localOk = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/.test(local);
+  const domainOk = /^[a-zA-Z0-9.-]+$/.test(domain);
+
+  if (!localOk || !domainOk) return false;
+
+  // each label must be valid
+  const labels = domain.split(".");
+  if (labels.some(l => !l || l.length > 63 || l.startsWith("-") || l.endsWith("-"))) return false;
+
+  // TLD should be letters (2-63) for clean validation
+  const tld = labels[labels.length - 1];
+  if (!/^[a-zA-Z]{2,63}$/.test(tld)) return false;
+
+  return true;
+}
+
   return {
     teacherProfile,
     profileLoading,
@@ -311,5 +350,6 @@ export default function useFuncs() {
     approveClaim,
     rejectClaim,
     actingClaimId,
+    isValidEmail
   };
 }

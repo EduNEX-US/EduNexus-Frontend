@@ -1,4 +1,3 @@
-// ========================= Functionality.ts (COPY-PASTE WHOLE) =========================
 import { useState, useReducer, useMemo } from "react";
 import { useAppSelector } from "../../../hooks/useAppSelector";
 

@@ -177,7 +177,7 @@ export default function Register_Students() {
                         <Button cn="mt-3 md:mt-6 bg-teal-500 text-white px-4 md:px-6 lg:text-lg text-sm md:ml-8 cursor-pointer py-2 rounded hover:bg-teal-600"
   onClick={() => handleShowCsvModal(true)}
 >
-  Import Teachers (CSV)
+  Upload Students (CSV)
 </Button>
         </Div>
 
@@ -240,10 +240,10 @@ export default function Register_Students() {
     <div className="bg-white w-[90%] md:w-[450px] rounded-xl p-6 shadow-lg">
 
       <h3 className="text-xl font-semibold text-amber-900 mb-2">
-        Import Teachers
+        Upload Students
       </h3>
       <p className="text-sm text-gray-500 mb-4">
-        Upload a CSV file to bulk-register teachers
+        Upload a CSV file to bulk-register students
       </p>
 
       {/* Upload box */}

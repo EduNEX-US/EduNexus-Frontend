@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Section, Div, Button, Span } from "../../../Components/Assembler";
-import { ptmData } from "./Functionality";
+import { Section, Div, Span } from "../../../Components/Assembler";
+import useFuncs from "./Functionality";
 import {
   faArrowUpRightFromSquare,
   faLocationDot,
@@ -8,6 +8,9 @@ import {
 import { faBell, faCalendar, faClock } from "@fortawesome/free-regular-svg-icons";
 
 export default function Ptm() {
+  const { ptmData, loading } = useFuncs(); // ✅ IMPORTANT (fetch runs here)
+
+  console.log(ptmData);
   return (
     <Section
       cn="
@@ -23,7 +26,6 @@ export default function Ptm() {
 
       {/* CONTENT WRAPPER */}
       <Div cn="flex flex-col gap-8 max-w-5xl w-full mx-auto">
-
         {/* ================= UPCOMING PTM ================= */}
         {ptmData.upcoming && (
           <Div
@@ -33,14 +35,10 @@ export default function Ptm() {
               rounded-2xl p-6 shadow-sm
             "
           >
-            {/* Accent strip */}
             <Div cn="absolute inset-x-0 top-0 h-1 bg-yellow-300">{""}</Div>
 
             <Div cn="flex items-center gap-2 mb-3">
-              <FontAwesomeIcon
-                icon={faBell}
-                className="text-yellow-300"
-              />
+              <FontAwesomeIcon icon={faBell} className="text-yellow-300" />
               <Span cn="text-sm font-medium text-yellow-100">
                 Upcoming Meeting
               </Span>
@@ -69,22 +67,33 @@ export default function Ptm() {
               </Span>
             </Div>
 
-            <a
-              href={ptmData.upcoming.meetLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                inline-flex items-center gap-2
-                px-5 py-2 rounded-lg
-                bg-white text-teal-500
-                font-medium
-                hover:bg-amber-50 transition
-              "
-            >
-              <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-              Join Online Meeting
-            </a>
+            {/* ✅ show Join only when link is available (Live Now) */}
+            {ptmData.upcoming.meetLink ? (
+              <a
+                href={ptmData.upcoming.meetLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-flex items-center gap-2
+                  px-5 py-2 rounded-lg
+                  bg-white text-teal-500
+                  font-medium
+                  hover:bg-amber-50 transition
+                "
+              >
+                <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                Join Online Meeting
+              </a>
+            ) : (
+              <Span cn="text-sm text-white/90">
+                Join link will appear when the meeting becomes Live.
+              </Span>
+            )}
           </Div>
+        )}
+
+        {loading && (
+          <Div cn="text-sm text-amber-700">Loading PTMs...</Div>
         )}
 
         {/* ================= PAST MEETINGS ================= */}
@@ -131,9 +140,12 @@ export default function Ptm() {
                 </Div>
               </Div>
             ))}
+
+            {!loading && ptmData.past.length === 0 && (
+              <Div cn="text-sm text-gray-600">No past meetings.</Div>
+            )}
           </Div>
         </Div>
-
       </Div>
     </Section>
   );

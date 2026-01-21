@@ -25,6 +25,10 @@ export default function Attendance() {
     goPrevMonth,
     goNextMonth,
 
+    // ✅ add bounds from hook (Apr -> Mar)
+    minMonth,
+    maxMonth,
+
     uploaded,
     notUploadedMsg,
 
@@ -43,6 +47,14 @@ export default function Attendance() {
     window.addEventListener("keydown", handleESC);
     return () => window.removeEventListener("keydown", handleESC);
   }, []);
+
+  // ✅ clamp month selection inside Apr->Mar bounds (applies to main UI + modal)
+  function setYearMonthClamped(v: string) {
+    if (!v) return;
+    if (v < minMonth) setYearMonth(minMonth);
+    else if (v > maxMonth) setYearMonth(maxMonth);
+    else setYearMonth(v);
+  }
 
   // ✅ search
   const [search, setSearch] = useState("");
@@ -181,7 +193,9 @@ export default function Attendance() {
           <input
             type="month"
             value={yearMonth}
-            onChange={(e) => setYearMonth(e.target.value)}
+            min={minMonth}
+            max={maxMonth}
+            onChange={(e) => setYearMonthClamped(e.target.value)}
             className="bg-transparent outline-none text-amber-800 font-medium"
             style={{ width: 120 }}
           />
@@ -278,7 +292,7 @@ export default function Attendance() {
             cn="bg-white rounded-2xl p-8 w-[560px] shadow-xl animate-scaleIn"
           >
             <Div cn="flex justify-between items-center mb-4">
-              <Div>
+              <Div cn="">
                 <Span cn="text-xl font-bold text-amber-900">Edit Attendance</Span>
                 <Div cn="text-xs text-amber-700 mt-1">
                   {editRow.name} • {editRow.studentId} • {editRow.yearMonth}
@@ -294,9 +308,7 @@ export default function Attendance() {
 
             {/* Total Days (read-only) */}
             <Div cn="mb-4 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              Total Days:{" "}
-              <Span cn="font-semibold">{editRow.totalDays}</Span>
-              {/* <Span cn="text-amber-700"> • You can only edit Present/Absent/Late</Span> */}
+              Total Days: <Span cn="font-semibold">{editRow.totalDays}</Span>
             </Div>
 
             {editErr && (
@@ -376,7 +388,9 @@ export default function Attendance() {
             <input
               type="month"
               value={yearMonth}
-              onChange={(e) => setYearMonth(e.target.value)}
+              min={minMonth}
+              max={maxMonth}
+              onChange={(e) => setYearMonthClamped(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-amber-200/40 mb-4 outline-none focus:ring-2 focus:ring-amber-300"
             />
 
